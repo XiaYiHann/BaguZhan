@@ -1,0 +1,183 @@
+<!-- Baguzhan Home Screen -->
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#A7F3D0", // Soft Mint
+                        "secondary": "#BAE6FD", // Light Sky Blue
+                        "accent": "#FEF3C7", // Pale Cream/Yellow
+                        "neobrutal-charcoal": "#2D3436", // Softened black
+                        "background-light": "#F9FAFB", // Off-white
+                        "path-line": "#E5E7EB",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'neobrutal': '0px 6px 0px 0px #2D3436',
+                        'neobrutal-sm': '0px 4px 0px 0px #2D3436',
+                        'node-active': '0px 8px 0px 0px #2D3436',
+                        'node-locked': '0px 8px 0px 0px #D1D5DB',
+                    },
+                    borderRadius: {
+                        "neo": "20px",
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .neo-border {
+            border: 3px solid #2D3436;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;
+        }
+        .path-line-segment {
+            width: 12px;
+            background-color: #E5E7EB;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light font-display text-neobrutal-charcoal min-h-screen">
+<nav class="sticky top-0 z-50 bg-white border-b-[3px] border-neobrutal-charcoal px-6 py-4 flex justify-between items-center h-20">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-orange-400 text-3xl">local_fire_department</span>
+<span class="font-black text-xl">15</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-3xl">diamond</span>
+<span class="font-black text-xl">420</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-pink-400 text-3xl">favorite</span>
+<span class="font-black text-xl">5</span>
+</div>
+</div>
+<div class="flex items-center">
+<button class="size-12 neo-border rounded-full bg-accent flex items-center justify-center shadow-neobrutal-sm active:translate-y-1 active:shadow-none">
+<span class="material-symbols-outlined text-2xl">person</span>
+</button>
+</div>
+</nav>
+<main class="max-w-md mx-auto px-6 pb-32 pt-10 relative min-h-screen">
+<div class="absolute right-6 top-6 w-32 h-auto z-20">
+<div class="relative flex flex-col items-center">
+<div class="neo-border bg-white p-3 rounded-2xl shadow-neobrutal-sm mb-3 text-sm font-bold leading-tight relative">
+                    Ready to slash through JVM?
+                    <div class="absolute -bottom-2 right-6 w-4 h-4 bg-white border-r-3 border-b-3 border-neobrutal-charcoal rotate-45 neo-border border-t-0 border-l-0"></div>
+</div>
+<div class="relative">
+<div class="absolute inset-0 bg-primary rounded-full blur-xl opacity-20"></div>
+<img alt="Samurai Mascot" class="w-20 h-20 rounded-full neo-border shadow-neobrutal-sm relative z-10 object-cover bg-accent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTkNM81bmKyrYaeISPtlUtKsCyH9qN4obKjYFHbjY8X-qN99SiZ04W8sVTef3Pz_CDgY28jFZYnI9Hr8B0OoStZq-2W5_4EUM8M05I7YOyHiJi2zgPgm5iJ9E14404Xv9a81odnHQMjqRZ8m2HlXkIg0QVJcYd-ooLbOD3ljoxTuuW_wCFYopajCDSjhg3ioMO2I_pA-r33S8QEy7hQNZR7J0YAuxMbDVm9dZOltnyfhI6TKxV7V8k3IEvtp6gIndx8CT2jQNUM2U"/>
+</div>
+</div>
+</div>
+<div class="neo-border bg-primary rounded-neo p-6 mb-16 shadow-neobrutal">
+<h2 class="text-sm font-black uppercase tracking-widest text-neobrutal-charcoal/60">Unit 2</h2>
+<h3 class="text-2xl font-black uppercase mt-1">Java Core &amp; JVM</h3>
+<p class="text-base font-bold mt-2 text-neobrutal-charcoal/80">Master memory management &amp; threading</p>
+</div>
+<div class="relative flex flex-col items-center gap-16 py-8">
+<div class="path-line-segment h-full top-0"></div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="size-24 rounded-full neo-border bg-primary shadow-node-active flex items-center justify-center cursor-pointer active:translate-y-1 active:shadow-none transition-all">
+<span class="material-symbols-outlined text-5xl">coffee</span>
+</div>
+<div class="mt-4">
+<span class="bg-neobrutal-charcoal text-white px-4 py-1.5 rounded-lg text-sm font-black uppercase tracking-wide">JVM Intro</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center mr-24">
+<div class="size-24 rounded-full neo-border bg-secondary shadow-node-active flex items-center justify-center cursor-pointer active:translate-y-1 active:shadow-none transition-all">
+<span class="material-symbols-outlined text-5xl">delete_sweep</span>
+</div>
+<div class="mt-4">
+<span class="bg-neobrutal-charcoal text-white px-4 py-1.5 rounded-lg text-sm font-black uppercase tracking-wide">Garbage Coll</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center ml-20">
+<div class="size-20 rounded-2xl neo-border bg-accent shadow-neobrutal-sm flex items-center justify-center cursor-pointer active:translate-y-1 active:shadow-none">
+<span class="material-symbols-outlined text-4xl text-orange-400">inventory_2</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="absolute inset-0 rounded-full animate-pulse bg-pink-200 opacity-40 -z-10 scale-125"></div>
+<div class="size-28 rounded-full neo-border bg-pink-100 shadow-[0px_8px_0px_0px_#2D3436] flex items-center justify-center cursor-pointer active:translate-y-1 active:shadow-none relative">
+<span class="material-symbols-outlined text-6xl text-pink-500">account_tree</span>
+</div>
+<div class="mt-6">
+<span class="bg-white neo-border text-neobrutal-charcoal px-5 py-2 rounded-xl shadow-neobrutal-sm text-sm font-black uppercase tracking-widest">Threads</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center ml-24">
+<div class="size-24 rounded-full border-3 border-gray-300 bg-gray-100 shadow-node-locked flex items-center justify-center grayscale opacity-60">
+<span class="material-symbols-outlined text-5xl text-gray-400">grid_view</span>
+</div>
+<div class="mt-4">
+<span class="bg-gray-300 text-white px-4 py-1.5 rounded-lg text-sm font-black uppercase tracking-wide">Collections</span>
+</div>
+<div class="absolute -top-2 -right-2 bg-white neo-border rounded-full size-10 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-xl text-gray-400">lock</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="size-24 rounded-full border-3 border-gray-300 bg-gray-100 shadow-node-locked flex items-center justify-center grayscale opacity-60">
+<span class="material-symbols-outlined text-5xl text-gray-400">memory</span>
+</div>
+<div class="mt-4">
+<span class="bg-gray-300 text-white px-4 py-1.5 rounded-lg text-sm font-black uppercase tracking-wide">OS Kernel</span>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t-[3px] border-neobrutal-charcoal px-8 py-3 pb-10 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1.5 text-primary scale-110">
+<span class="material-symbols-outlined text-3xl">home</span>
+<span class="text-xs font-black uppercase">Path</span>
+</button>
+<button class="flex flex-col items-center gap-1.5 text-gray-400">
+<span class="material-symbols-outlined text-3xl">ads_click</span>
+<span class="text-xs font-black uppercase">Practice</span>
+</button>
+<button class="flex flex-col items-center gap-1.5 text-gray-400">
+<span class="material-symbols-outlined text-3xl">leaderboard</span>
+<span class="text-xs font-black uppercase">Leagues</span>
+</button>
+<button class="flex flex-col items-center gap-1.5 text-gray-400">
+<span class="material-symbols-outlined text-3xl">store</span>
+<span class="text-xs font-black uppercase">Shop</span>
+</button>
+</div>
+<div class="fixed bottom-28 right-6 z-40">
+<button class="size-16 neo-border rounded-2xl bg-accent shadow-neobrutal flex items-center justify-center active:translate-y-1 active:shadow-none transition-transform">
+<span class="material-symbols-outlined text-4xl text-neobrutal-charcoal">psychology</span>
+</button>
+</div>
+
+</body></html>

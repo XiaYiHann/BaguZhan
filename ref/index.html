@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>八股斩 - 本地预览入口</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #f9fafb;
+      color: #111827;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0 0 16px;
+    }
+    p {
+      margin: 0 0 24px;
+      color: #6b7280;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 16px;
+    }
+    a {
+      display: block;
+      padding: 16px 18px;
+      background: #ffffff;
+      border: 2px solid #111827;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #111827;
+      font-weight: 700;
+      box-shadow: 0 4px 0 0 #111827;
+    }
+    a:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 0 #111827;
+    }
+    .caption {
+      display: block;
+      margin-top: 6px;
+      font-weight: 500;
+      color: #6b7280;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>八股斩 - 本地预览入口</h1>
+    <p>点击下面页面进行本地预览（需在浏览器中打开）。</p>
+    <ul>
+      <li>
+        <a href="./home.html">Home / 路径地图
+          <span class="caption">首页路径与关卡选择</span>
+        </a>
+      </li>
+      <li>
+        <a href="./question.html">Question / 斩题作答
+          <span class="caption">答题交互与选项样式</span>
+        </a>
+      </li>
+      <li>
+        <a href="./feedback.html">Feedback / 解析反馈
+          <span class="caption">AI 解析、助记与场景说明</span>
+        </a>
+      </li>
+    </ul>
+  </main>
+</body>
+</html>

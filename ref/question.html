@@ -1,0 +1,207 @@
+<!-- Question Slashing Screen -->
+<!DOCTYPE html>
+<html class="light" lang="zh"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>八股斩 - Slashing Session</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&amp;family=Noto+Sans+SC:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25f447",
+                        "duo-green": "#58cc02",
+                        "duo-blue": "#1cb0f6",
+                        "soft-cream": "#FCF9F1",
+                        "soft-lavender": "#F3F0FF",
+                        "soft-peach": "#FFF5F0",
+                        "soft-mint": "#F0FFF4",
+                        "soft-blue": "#F0F7FF",
+                        "border-gray": "#E5E5E5",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "Noto Sans SC", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'duo': '0 4px 0 0 #e5e5e5',
+                        'duo-active': '0 0px 0 0 #e5e5e5',
+                        'duo-green': '0 4px 0 0 #46a302',
+                        'duo-blue-shadow': '0 4px 0 0 #1899d6',
+                        'brutal': '4px 4px 0px 0px #000000',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border: 3px solid #000000;
+        }
+        .speech-bubble:after, .speech-bubble:before {
+            right: 100%;
+            top: 70%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        .speech-bubble:after {
+            border-color: rgba(255, 255, 255, 0);
+            border-right-color: #ffffff;
+            border-width: 12px;
+            margin-top: -12px;
+        }
+        .speech-bubble:before {
+            border-color: rgba(0, 0, 0, 0);
+            border-right-color: #000000;
+            border-width: 16px;
+            margin-top: -16px;
+        }
+        .option-button {
+            @apply relative w-full text-left p-5 mb-4 border-2 border-border-gray rounded-2xl transition-all duration-100 flex items-center gap-4;
+            box-shadow: 0 4px 0 0 #e5e5e5;
+        }
+        .option-button:active {
+            @apply translate-y-[2px];
+            box-shadow: 0 2px 0 0 #e5e5e5;
+        }
+        .option-radio:checked + .option-button {
+            @apply border-duo-blue bg-soft-blue ring-2 ring-duo-blue ring-opacity-10;
+            box-shadow: 0 4px 0 0 #1899d6;
+        }
+        .option-radio:checked + .option-button .option-text {
+            @apply text-duo-blue;
+        }
+        .option-radio:checked + .option-button .option-index {
+            @apply border-duo-blue bg-duo-blue text-white;
+        }
+        .progress-container {
+            height: 14px;
+            background: #e5e5e5;
+            border-radius: 99px;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #58cc02;
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+        .mascot-thumb {
+            position: absolute;
+            top: -14px;
+            transform: translateX(-50%);
+            transition: left 0.3s ease;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-soft-cream text-zinc-800 min-h-screen flex flex-col">
+<header class="p-4 flex items-center gap-4 bg-soft-cream/80 backdrop-blur-sm sticky top-0 z-10">
+<button class="text-zinc-400 hover:text-black">
+<span class="material-symbols-outlined font-bold text-3xl">close</span>
+</button>
+<div class="flex-grow progress-container">
+<div class="progress-bar" style="width: 70%;"></div>
+<div class="mascot-thumb" style="left: 70%;">
+<div class="bg-black text-white p-1 rounded-full border-2 border-white shadow-md">
+<span class="material-symbols-outlined text-sm block">swords</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 text-orange-500 font-bold">
+<span class="material-symbols-outlined fill-1">local_fire_department</span>
+<span>3</span>
+</div>
+</header>
+<main class="flex-grow flex flex-col px-6 pt-6 max-w-md mx-auto w-full">
+<div class="flex items-start gap-3 mb-10">
+<div class="w-16 h-16 flex-shrink-0 relative mt-4">
+<div class="w-full h-full bg-primary border-[3px] border-black rounded-xl flex items-center justify-center overflow-hidden shadow-brutal">
+<span class="material-symbols-outlined text-4xl text-black">person_filled</span>
+</div>
+</div>
+<div class="speech-bubble flex-grow p-5 rounded-2xl shadow-brutal">
+<h2 class="text-[26pt] font-[800] leading-[1.15] text-black tracking-tight">
+                    Which component handles the <span class="text-duo-blue">Event Loop</span>?
+                </h2>
+</div>
+</div>
+<div class="flex-grow">
+<form id="quiz-form">
+<label class="block cursor-pointer">
+<input class="hidden option-radio" name="option" type="radio" value="1"/>
+<div class="option-button bg-soft-lavender">
+<span class="option-index w-10 h-10 flex items-center justify-center border-2 border-zinc-200 rounded-xl font-bold text-zinc-400 text-lg">1</span>
+<span class="option-text font-bold text-xl text-zinc-700">Libuv library</span>
+</div>
+</label>
+<label class="block cursor-pointer">
+<input class="hidden option-radio" name="option" type="radio" value="2"/>
+<div class="option-button bg-soft-peach">
+<span class="option-index w-10 h-10 flex items-center justify-center border-2 border-zinc-200 rounded-xl font-bold text-zinc-400 text-lg">2</span>
+<span class="option-text font-bold text-xl text-zinc-700">V8 Engine Core</span>
+</div>
+</label>
+<label class="block cursor-pointer">
+<input class="hidden option-radio" name="option" type="radio" value="3"/>
+<div class="option-button bg-soft-mint">
+<span class="option-index w-10 h-10 flex items-center justify-center border-2 border-zinc-200 rounded-xl font-bold text-zinc-400 text-lg">3</span>
+<span class="option-text font-bold text-xl text-zinc-700">OS Kernel</span>
+</div>
+</label>
+<label class="block cursor-pointer">
+<input class="hidden option-radio" name="option" type="radio" value="4"/>
+<div class="option-button bg-white">
+<span class="option-index w-10 h-10 flex items-center justify-center border-2 border-zinc-200 rounded-xl font-bold text-zinc-400 text-lg">4</span>
+<span class="option-text font-bold text-xl text-zinc-700">API Bindings</span>
+</div>
+</label>
+</form>
+</div>
+</main>
+<footer class="p-6 border-t-2 border-border-gray bg-white sticky bottom-0">
+<div class="max-w-md mx-auto">
+<button class="w-full py-5 rounded-2xl font-black text-xl uppercase tracking-widest bg-border-gray text-zinc-400 transition-all duration-100 active:translate-y-1 active:shadow-none" id="check-btn" style="box-shadow: 0 4px 0 0 #d4d4d4;">
+                Check Answer
+            </button>
+<div class="flex justify-between mt-6 px-2">
+<button class="text-sm font-bold text-zinc-400 uppercase tracking-widest hover:text-zinc-600">Skip</button>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-zinc-300 cursor-pointer hover:text-zinc-500">lightbulb</span>
+<span class="material-symbols-outlined text-zinc-300 cursor-pointer hover:text-zinc-500">flag</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        document.querySelectorAll('input[name="option"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const btn = document.getElementById('check-btn');
+                btn.style.backgroundColor = '#58cc02';
+                btn.style.color = 'white';
+                btn.style.boxShadow = '0 4px 0 0 #46a302';
+                btn.innerText = 'Slash it!';
+            });
+        });
+    </script>
+
+</body></html>
