@@ -89,9 +89,10 @@ echo -e "${BLUE}[2/3] 启动 iPhone 模拟器...${NC}"
 # 切换到 Flutter 项目目录
 cd "$SCRIPT_DIR/baguzhan"
 
-# 默认使用 iPhone 16 模拟器
-DEVICE_ID=$(xcrun simctl list devices available | grep "iPhone 16" | grep -v "Pro\|Plus\|e" | grep -oE '[A-F0-9-]{36}' | head -n 1)
-DEVICE_NAME=$(xcrun simctl list devices available | grep "iPhone 16" | grep -v "Pro\|Plus\|e" | sed 's/ *(//' | sed 's/).*//')
+# 默认使用 iPhone 16 模拟器（排除 Pro、Plus、e 型号）
+DEVICE_LINE=$(xcrun simctl list devices available | grep "iPhone 16" | grep -vE "(iPhone 16 Pro|iPhone 16 Plus|iPhone 16e)" | head -1)
+DEVICE_ID=$(echo "$DEVICE_LINE" | grep -oE '[A-F0-9-]{36}')
+DEVICE_NAME=$(echo "$DEVICE_LINE" | sed 's/ *(//' | sed 's/).*//')
 
 if [ -z "$DEVICE_ID" ]; then
     echo -e "${RED}错误: 未找到可用的 iPhone 模拟器${NC}"
