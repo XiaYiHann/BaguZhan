@@ -125,7 +125,7 @@
 
 ### 5.2 合并准备
 - [x] 更新 CHANGELOG
-- [ ] 合并分支到 main
+- [x] 合并分支到 main
 - [ ] 创建 GitHub Release
 - **验证**：版本发布成功
 
