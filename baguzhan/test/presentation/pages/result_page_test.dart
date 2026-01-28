@@ -1,8 +1,8 @@
 import 'package:baguzhan/data/models/option_model.dart';
 import 'package:baguzhan/data/models/question_model.dart';
+import 'package:baguzhan/data/repositories/question_repository.dart';
 import 'package:baguzhan/presentation/pages/result_page.dart';
 import 'package:baguzhan/presentation/providers/question_provider.dart';
-import 'package:baguzhan/data/repositories/question_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +37,23 @@ class _FakeRepo implements QuestionRepository {
   Future<QuestionModel?> getQuestionById(String id) async => null;
 
   @override
-  Future<List<QuestionModel>> getQuestions({String? topic, int? limit}) async => [];
+  Future<List<QuestionModel>> getQuestions({
+    String? topic,
+    String? difficulty,
+    int? limit,
+    int? offset,
+  }) async {
+    return [];
+  }
+
+  @override
+  Future<List<QuestionModel>> getRandomQuestions({
+    String? topic,
+    String? difficulty,
+    int? count,
+  }) async {
+    return [];
+  }
 }
 
 void main() {
