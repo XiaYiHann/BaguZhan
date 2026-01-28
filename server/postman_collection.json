@@ -1,0 +1,112 @@
+{
+  "info": {
+    "name": "八股斩 BFF API",
+    "description": "八股斩 Backend for Frontend API 集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "健康检查",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "检查服务健康状态"
+      },
+      "response": []
+    },
+    {
+      "name": "获取题目列表",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/questions?topic=JavaScript&difficulty=easy&limit=10&offset=0",
+          "host": ["{{baseUrl}}"],
+          "path": ["questions"],
+          "query": [
+            {
+              "key": "topic",
+              "value": "JavaScript",
+              "description": "主题筛选"
+            },
+            {
+              "key": "difficulty",
+              "value": "easy",
+              "description": "难度筛选: easy, medium, hard"
+            },
+            {
+              "key": "limit",
+              "value": "10",
+              "description": "返回数量"
+            },
+            {
+              "key": "offset",
+              "value": "0",
+              "description": "分页偏移"
+            }
+          ]
+        },
+        "description": "获取题目列表，支持筛选和分页"
+      },
+      "response": []
+    },
+    {
+      "name": "获取随机题目",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/questions/random?topic=JavaScript&count=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["questions", "random"],
+          "query": [
+            {
+              "key": "topic",
+              "value": "JavaScript",
+              "description": "主题筛选"
+            },
+            {
+              "key": "difficulty",
+              "value": "",
+              "description": "难度筛选（可选）"
+            },
+            {
+              "key": "count",
+              "value": "5",
+              "description": "返回数量"
+            }
+          ]
+        },
+        "description": "随机获取指定数量的题目"
+      },
+      "response": []
+    },
+    {
+      "name": "获取单个题目",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/questions/js-1",
+          "host": ["{{baseUrl}}"],
+          "path": ["questions", "js-1"]
+        },
+        "description": "根据 ID 获取单个题目详情"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "API 基础地址"
+    }
+  ]
+}
