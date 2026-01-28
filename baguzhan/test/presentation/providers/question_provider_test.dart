@@ -9,7 +9,23 @@ class FakeQuestionRepository implements QuestionRepository {
   Future<QuestionModel?> getQuestionById(String id) async => _questions.first;
 
   @override
-  Future<List<QuestionModel>> getQuestions({String? topic, int? limit}) async => _questions;
+  Future<List<QuestionModel>> getQuestions({
+    String? topic,
+    String? difficulty,
+    int? limit,
+    int? offset,
+  }) async {
+    return _questions;
+  }
+
+  @override
+  Future<List<QuestionModel>> getRandomQuestions({
+    String? topic,
+    String? difficulty,
+    int? count,
+  }) async {
+    return _questions;
+  }
 }
 
 final _questions = [
@@ -36,7 +52,7 @@ void main() {
     final provider = QuestionProvider(FakeQuestionRepository());
     await provider.loadQuestions('JavaScript');
     expect(provider.questions.length, 1);
-    expect(provider.isLoading, false);
+    expect(provider.state, QuestionState.loaded);
   });
 
   test('QuestionProvider submitAnswer updates stats', () async {
