@@ -25,7 +25,6 @@ export const createApp = (db?: DbClient) => {
 
   const userProgressRepository = new UserProgressRepository(database);
   const userProgressService = new UserProgressService(userProgressRepository);
-
   app.use(cors());
   app.use(express.json());
   app.use(morgan('dev'));

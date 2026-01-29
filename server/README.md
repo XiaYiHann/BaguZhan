@@ -169,7 +169,7 @@ npm run format
 
 | 变量名 | 说明 | 默认值 |
 |--------|------|--------|
-| `PORT` | 服务端口 | `3000` |
+| `PORT` | 服务端口 | `37123` |
 | `NODE_ENV` | 运行环境 | `development` |
 | `DB_PATH` | 数据库文件路径 | `./database/data.db` |
 
@@ -198,6 +198,43 @@ npm run format
 | `option_text` | TEXT | 选项文本 |
 | `option_order` | INTEGER | 选项顺序 |
 | `is_correct` | BOOLEAN | 是否正确 |
+
+### user_answers 表
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | TEXT PRIMARY KEY | 记录 ID |
+| `user_id` | TEXT | 用户 ID |
+| `question_id` | TEXT FK | 关联题目 |
+| `selected_option_id` | TEXT | 选择的选项 |
+| `is_correct` | BOOLEAN | 是否正确 |
+| `answer_time_ms` | INTEGER | 答题耗时 |
+| `answered_at` | TIMESTAMP | 答题时间 |
+
+### wrong_book 表
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | TEXT PRIMARY KEY | 记录 ID |
+| `user_id` | TEXT | 用户 ID |
+| `question_id` | TEXT FK | 关联题目 |
+| `wrong_count` | INTEGER | 错误次数 |
+| `last_wrong_at` | TIMESTAMP | 最后错误时间 |
+| `is_mastered` | BOOLEAN | 是否已掌握 |
+| `mastered_at` | TIMESTAMP | 掌握时间 |
+
+### learning_progress 表
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | TEXT PRIMARY KEY | 记录 ID |
+| `user_id` | TEXT | 用户 ID |
+| `total_answered` | INTEGER | 总答题数 |
+| `total_correct` | INTEGER | 总正确数 |
+| `current_streak` | INTEGER | 当前连续正确数 |
+| `longest_streak` | INTEGER | 最长连续正确数 |
+| `last_answered_at` | TIMESTAMP | 最后答题时间 |
+| `updated_at` | TIMESTAMP | 更新时间 |
 
 ## 性能优化
 
