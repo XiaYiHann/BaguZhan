@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_theme.dart';
+import '../widgets/duo_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -68,18 +68,8 @@ class _HomePageState extends State<HomePage>
                             arguments: topic,
                           );
                         },
-                        child: Container(
+                        child: DuoCard(
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surface,
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusCard),
-                            border: Border.all(
-                              color: AppTheme.outlineStrong,
-                              width: AppTheme.borderWidth,
-                            ),
-                            boxShadow: const [AppTheme.shadowDown],
-                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

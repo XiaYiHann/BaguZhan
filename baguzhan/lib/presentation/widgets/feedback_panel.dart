@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../data/models/question_model.dart';
+import 'action_buttons.dart';
+import 'duo_card.dart';
 
 class FeedbackPanel extends StatelessWidget {
   const FeedbackPanel({
@@ -26,16 +28,11 @@ class FeedbackPanel extends StatelessWidget {
     final maxPanelHeight =
         (MediaQuery.sizeOf(context).height * 0.45).clamp(240.0, 420.0);
 
-    return Container(
+    return DuoCard(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _background,
-        borderRadius: BorderRadius.circular(AppTheme.radiusPanel),
-        border: Border.all(
-            color: AppTheme.outlineStrong, width: AppTheme.borderWidth),
-        boxShadow: const [AppTheme.shadowDown],
-      ),
+      color: _background,
+      radius: AppTheme.radiusPanel,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxPanelHeight),
         child: Column(
@@ -71,13 +68,10 @@ class FeedbackPanel extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                key: const ValueKey('continue-button'),
-                onPressed: onContinue,
-                child: Text(isLast ? '查看结果' : '下一题'),
-              ),
+            ActionButtons(
+              primaryKey: const ValueKey('continue-button'),
+              primaryLabel: isLast ? '查看结果' : '下一题',
+              onPrimaryPressed: onContinue,
             ),
           ],
         ),

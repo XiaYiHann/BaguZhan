@@ -40,14 +40,18 @@ class _QuestionPageState extends State<QuestionPage> {
             return const LoadingStateView();
           }
           if (provider.errorMessage != null) {
-            return ErrorStateView(
-              message: provider.errorMessage!,
-              onRetry: () => provider.loadQuestions(widget.topic),
+            return MessageStateView(
+              icon: Icons.wifi_off,
+              title: '加载失败',
+              subtitle: provider.errorMessage!,
+              actionLabel: '重试',
+              onAction: () => provider.loadQuestions(widget.topic),
             );
           }
           final question = provider.currentQuestion;
           if (question == null) {
-            return const EmptyStateView(
+            return const MessageStateView(
+              icon: Icons.inbox,
               title: '暂无题目',
               subtitle: '换个主题试试，或者稍后再来。',
             );

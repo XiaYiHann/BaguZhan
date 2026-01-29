@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../data/models/question_model.dart';
+import 'duo_card.dart';
 
 class QuestionCard extends StatelessWidget {
   const QuestionCard({
@@ -13,17 +14,8 @@ class QuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DuoCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(
-          color: AppTheme.outlineStrong,
-          width: AppTheme.borderWidth,
-        ),
-        boxShadow: const [AppTheme.shadowDown],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

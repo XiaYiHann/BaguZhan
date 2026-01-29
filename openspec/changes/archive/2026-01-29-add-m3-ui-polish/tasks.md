@@ -11,6 +11,6 @@
 - [x] 1.7 ResultPage：统计数字动效（计数器），并优化按钮层级
 - [x] 1.8 加载/错误/空状态组件化（骨架/占位/提示文案与按钮）
 - [x] 1.9 补齐/更新 Widget 测试覆盖关键状态与交互（至少 OptionCard/FeedbackPanel/ProgressBar）
-- [ ] 1.10 添加 Golden 测试覆盖关键视觉状态（OptionCard/ProgressBar/FeedbackPanel）
+- [x] 1.10 添加 Golden 测试覆盖关键视觉状态（OptionCard/ProgressBar/FeedbackPanel）
 - [x] 1.11 验证：`flutter test`
 - [x] 1.12 验证：`flutter analyze`

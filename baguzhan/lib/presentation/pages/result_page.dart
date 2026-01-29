@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../providers/question_provider.dart';
+import '../widgets/action_buttons.dart';
+import '../widgets/duo_card.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({super.key});
@@ -49,35 +51,19 @@ class _ResultPageState extends State<ResultPage> {
               value: _AnimatedNumber(value: accuracyValue, suffix: '%'),
             ),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(
-                    context,
-                    '/question',
-                    arguments: topic,
-                  );
-                },
-                child: const Text('重新开始'),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(
-                    color: AppTheme.borderGray,
-                    width: AppTheme.borderWidth,
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text('返回首页'),
-              ),
+            ActionButtons(
+              primaryLabel: '重新开始',
+              onPrimaryPressed: () {
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/question',
+                  arguments: topic,
+                );
+              },
+              secondaryLabel: '返回首页',
+              onSecondaryPressed: () {
+                Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+              },
             ),
           ],
         ),
@@ -116,16 +102,11 @@ class _StatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DuoCard(
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusChip),
-        border:
-            Border.all(color: AppTheme.borderGray, width: AppTheme.borderWidth),
-        boxShadow: const [AppTheme.shadowDown],
-      ),
+      borderColor: AppTheme.borderGray,
+      radius: AppTheme.radiusChip,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -50,3 +50,13 @@ TBD - created by archiving change add-m1-basic-ui. Update Purpose after archive.
 - **那么** IDE 显示警告/错误提示
 - **并且** `flutter analyze` 报告问题
 
+### 需求：主题配置与一致性
+
+系统 MUST 将主题（颜色、文字层级、圆角、阴影）集中管理，并在应用内一致使用。
+
+#### 场景：主题入口统一
+
+- **当** 应用启动
+- **那么** MaterialApp 使用统一的 ThemeData
+- **并且** 核心页面与组件不直接硬编码颜色常量（通过主题/Token 访问）
+

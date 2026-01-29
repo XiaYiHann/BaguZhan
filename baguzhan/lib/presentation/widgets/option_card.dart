@@ -3,6 +3,27 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme/app_theme.dart';
 
+enum _OptionVisualState {
+  normal,
+  selected,
+  correct,
+  incorrect,
+}
+
+class _OptionVisualStyle {
+  const _OptionVisualStyle({
+    required this.borderColor,
+    required this.backgroundColor,
+    required this.indexBackgroundColor,
+    required this.indexTextColor,
+  });
+
+  final Color borderColor;
+  final Color backgroundColor;
+  final Color indexBackgroundColor;
+  final Color indexTextColor;
+}
+
 class OptionCard extends StatefulWidget {
   const OptionCard({
     super.key,
@@ -30,50 +51,44 @@ class OptionCard extends StatefulWidget {
 class _OptionCardState extends State<OptionCard> {
   bool _pressed = false;
 
-  Color _borderColor() {
+  static const _styles = <_OptionVisualState, _OptionVisualStyle>{
+    _OptionVisualState.normal: _OptionVisualStyle(
+      borderColor: AppTheme.borderGray,
+      backgroundColor: Colors.white,
+      indexBackgroundColor: Colors.white,
+      indexTextColor: AppTheme.textSecondary,
+    ),
+    _OptionVisualState.selected: _OptionVisualStyle(
+      borderColor: AppTheme.duoBlue,
+      backgroundColor: AppTheme.selectedBackground,
+      indexBackgroundColor: AppTheme.duoBlue,
+      indexTextColor: Colors.white,
+    ),
+    _OptionVisualState.correct: _OptionVisualStyle(
+      borderColor: AppTheme.duoGreen,
+      backgroundColor: AppTheme.correctBackground,
+      indexBackgroundColor: AppTheme.duoGreen,
+      indexTextColor: Colors.white,
+    ),
+    _OptionVisualState.incorrect: _OptionVisualStyle(
+      borderColor: AppTheme.duoRed,
+      backgroundColor: AppTheme.incorrectBackground,
+      indexBackgroundColor: AppTheme.duoRed,
+      indexTextColor: Colors.white,
+    ),
+  };
+
+  _OptionVisualState get _visualState {
     if (widget.isCorrect) {
-      return AppTheme.duoGreen;
+      return _OptionVisualState.correct;
     }
     if (widget.isIncorrect) {
-      return AppTheme.duoRed;
+      return _OptionVisualState.incorrect;
     }
     if (widget.isSelected) {
-      return AppTheme.duoBlue;
+      return _OptionVisualState.selected;
     }
-    return AppTheme.borderGray;
-  }
-
-  Color _backgroundColor() {
-    if (widget.isCorrect) {
-      return AppTheme.correctBackground;
-    }
-    if (widget.isIncorrect) {
-      return AppTheme.incorrectBackground;
-    }
-    if (widget.isSelected) {
-      return AppTheme.selectedBackground;
-    }
-    return Colors.white;
-  }
-
-  Color _indexBackgroundColor() {
-    if (widget.isCorrect) {
-      return AppTheme.duoGreen;
-    }
-    if (widget.isIncorrect) {
-      return AppTheme.duoRed;
-    }
-    if (widget.isSelected) {
-      return AppTheme.duoBlue;
-    }
-    return Colors.white;
-  }
-
-  Color _indexTextColor() {
-    if (widget.isCorrect || widget.isIncorrect || widget.isSelected) {
-      return Colors.white;
-    }
-    return AppTheme.textSecondary;
+    return _OptionVisualState.normal;
   }
 
   void _setPressed(bool value) {
@@ -90,6 +105,7 @@ class _OptionCardState extends State<OptionCard> {
 
   @override
   Widget build(BuildContext context) {
+    final style = _styles[_visualState]!;
     final shadow = _pressed ? AppTheme.shadowPressed : AppTheme.shadowDown;
     final translateY = _pressed ? 2.0 : 0.0;
 
@@ -110,10 +126,10 @@ class _OptionCardState extends State<OptionCard> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: _backgroundColor(),
+          color: style.backgroundColor,
           borderRadius: BorderRadius.circular(AppTheme.radiusCard),
           border:
-              Border.all(color: _borderColor(), width: AppTheme.borderWidth),
+              Border.all(color: style.borderColor, width: AppTheme.borderWidth),
           boxShadow: [shadow],
         ),
         child: Row(
@@ -123,10 +139,10 @@ class _OptionCardState extends State<OptionCard> {
               height: 36,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: _indexBackgroundColor(),
+                color: style.indexBackgroundColor,
                 borderRadius: BorderRadius.circular(AppTheme.radiusChip),
                 border: Border.all(
-                  color: _borderColor(),
+                  color: style.borderColor,
                   width: AppTheme.borderWidth,
                 ),
               ),
@@ -134,7 +150,7 @@ class _OptionCardState extends State<OptionCard> {
                 widget.indexLabel,
                 style: TextStyle(
                   fontWeight: FontWeight.w800,
-                  color: _indexTextColor(),
+                  color: style.indexTextColor,
                 ),
               ),
             ),
