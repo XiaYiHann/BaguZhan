@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('UserAnswerModel stores answer data', () {
-    final model = UserAnswerModel(
+    const model = UserAnswerModel(
       questionId: 'q1',
       selectedIndex: 2,
       isCorrect: false,
-      duration: const Duration(seconds: 3),
+      duration: Duration(seconds: 3),
     );
 
     expect(model.questionId, 'q1');

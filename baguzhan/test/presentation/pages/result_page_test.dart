@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 class FakeQuestionProvider extends QuestionProvider {
   FakeQuestionProvider() : super(_FakeRepo()) {
     questions = [
-      QuestionModel(
+      const QuestionModel(
         id: 'q1',
         content: '题目',
         topic: 'JavaScript',
@@ -18,12 +18,16 @@ class FakeQuestionProvider extends QuestionProvider {
         explanation: null,
         mnemonic: null,
         scenario: null,
-        tags: const [],
-        options: const [
-          OptionModel(id: 'o1', optionText: 'A', optionOrder: 0, isCorrect: true),
-          OptionModel(id: 'o2', optionText: 'B', optionOrder: 1, isCorrect: false),
-          OptionModel(id: 'o3', optionText: 'C', optionOrder: 2, isCorrect: false),
-          OptionModel(id: 'o4', optionText: 'D', optionOrder: 3, isCorrect: false),
+        tags: [],
+        options: [
+          OptionModel(
+              id: 'o1', optionText: 'A', optionOrder: 0, isCorrect: true),
+          OptionModel(
+              id: 'o2', optionText: 'B', optionOrder: 1, isCorrect: false),
+          OptionModel(
+              id: 'o3', optionText: 'C', optionOrder: 2, isCorrect: false),
+          OptionModel(
+              id: 'o4', optionText: 'D', optionOrder: 3, isCorrect: false),
         ],
       ),
     ];

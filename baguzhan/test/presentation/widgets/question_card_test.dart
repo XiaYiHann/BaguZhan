@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('QuestionCard renders content and tags', (tester) async {
-    final question = QuestionModel(
+    const question = QuestionModel(
       id: 'q1',
       content: '问题内容',
       topic: 'JavaScript',
@@ -14,17 +14,20 @@ void main() {
       explanation: null,
       mnemonic: null,
       scenario: null,
-      tags: const ['event-loop', 'async'],
-      options: const [
+      tags: ['event-loop', 'async'],
+      options: [
         OptionModel(id: 'o1', optionText: 'A', optionOrder: 0, isCorrect: true),
-        OptionModel(id: 'o2', optionText: 'B', optionOrder: 1, isCorrect: false),
-        OptionModel(id: 'o3', optionText: 'C', optionOrder: 2, isCorrect: false),
-        OptionModel(id: 'o4', optionText: 'D', optionOrder: 3, isCorrect: false),
+        OptionModel(
+            id: 'o2', optionText: 'B', optionOrder: 1, isCorrect: false),
+        OptionModel(
+            id: 'o3', optionText: 'C', optionOrder: 2, isCorrect: false),
+        OptionModel(
+            id: 'o4', optionText: 'D', optionOrder: 3, isCorrect: false),
       ],
     );
 
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Scaffold(body: QuestionCard(question: question)),
       ),
     );

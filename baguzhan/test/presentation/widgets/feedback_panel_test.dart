@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('FeedbackPanel renders explanation and mnemonic', (tester) async {
-    final question = QuestionModel(
+    const question = QuestionModel(
       id: 'q1',
       content: '题目',
       topic: 'JavaScript',
@@ -14,12 +14,15 @@ void main() {
       explanation: '解析内容',
       mnemonic: '助记内容',
       scenario: '场景内容',
-      tags: const ['tag'],
-      options: const [
+      tags: ['tag'],
+      options: [
         OptionModel(id: 'o1', optionText: 'A', optionOrder: 0, isCorrect: true),
-        OptionModel(id: 'o2', optionText: 'B', optionOrder: 1, isCorrect: false),
-        OptionModel(id: 'o3', optionText: 'C', optionOrder: 2, isCorrect: false),
-        OptionModel(id: 'o4', optionText: 'D', optionOrder: 3, isCorrect: false),
+        OptionModel(
+            id: 'o2', optionText: 'B', optionOrder: 1, isCorrect: false),
+        OptionModel(
+            id: 'o3', optionText: 'C', optionOrder: 2, isCorrect: false),
+        OptionModel(
+            id: 'o4', optionText: 'D', optionOrder: 3, isCorrect: false),
       ],
     );
 

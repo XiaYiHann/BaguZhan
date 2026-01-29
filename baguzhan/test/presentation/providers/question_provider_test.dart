@@ -28,7 +28,7 @@ class FakeQuestionRepository implements QuestionRepository {
   }
 }
 
-final _questions = [
+const _questions = [
   QuestionModel(
     id: 'q1',
     content: '题目',
@@ -37,8 +37,8 @@ final _questions = [
     explanation: '解析',
     mnemonic: '口诀',
     scenario: '场景',
-    tags: const ['tag'],
-    options: const [
+    tags: ['tag'],
+    options: [
       OptionModel(id: 'o1', optionText: 'A', optionOrder: 0, isCorrect: false),
       OptionModel(id: 'o2', optionText: 'B', optionOrder: 1, isCorrect: true),
       OptionModel(id: 'o3', optionText: 'C', optionOrder: 2, isCorrect: false),
