@@ -55,7 +55,7 @@ npm run build
 npm start
 ```
 
-服务默认运行在 `http://localhost:3000`
+服务默认运行在 `http://localhost:37123`（可通过环境变量 `PORT` 覆盖）
 
 ## API 端点
 

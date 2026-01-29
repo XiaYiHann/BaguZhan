@@ -31,6 +31,9 @@ trap cleanup EXIT INT TERM
 echo -e "${GREEN}=== 八股斩完整启动脚本 ===${NC}"
 echo ""
 
+# BFF 端口（避免与常用 3000/3001 冲突）
+BFF_PORT="${BFF_PORT:-37123}"
+
 # ============ 第一步：启动后端服务 ============
 echo -e "${BLUE}[1/3] 启动后端服务...${NC}"
 
@@ -53,7 +56,7 @@ fi
 
 # 启动后端服务（后台运行）
 cd "$SERVER_DIR"
-npm run dev > "$SCRIPT_DIR/backend.log" 2>&1 &
+PORT="$BFF_PORT" npm run dev > "$SCRIPT_DIR/backend.log" 2>&1 &
 BACKEND_PID=$!
 cd "$SCRIPT_DIR"
 
@@ -71,9 +74,10 @@ if ! kill -0 $BACKEND_PID 2>/dev/null; then
     exit 1
 fi
 
-# 健康检查
+# 健康检查（必须 200 + JSON）
 for i in {1..10}; do
-    if curl -s http://localhost:3000/health > /dev/null 2>&1; then
+    HEALTH_RESP="$(curl -fsS http://localhost:${BFF_PORT}/health 2>/dev/null || true)"
+    if [[ "$HEALTH_RESP" == *'"status"'*'"ok"'* ]]; then
         echo -e "${GREEN}后端服务就绪！${NC}\n"
         break
     fi
@@ -120,7 +124,7 @@ fi
 
 # ============ 第三步：运行 Flutter 应用 ============
 echo -e "${BLUE}[3/3] 启动 Flutter 应用...${NC}"
-echo -e "${GREEN}后端运行中: ${YELLOW}http://localhost:3000${NC}"
+echo -e "${GREEN}后端运行中: ${YELLOW}http://localhost:${BFF_PORT}${NC}"
 echo -e "${GREEN}后端日志: ${YELLOW}$SCRIPT_DIR/backend.log${NC}"
 echo ""
 echo -e "${YELLOW}提示: 按 Ctrl+C 退出应用并关闭后端服务${NC}"
