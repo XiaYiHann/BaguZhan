@@ -7,6 +7,7 @@ import '../widgets/feedback_panel.dart';
 import '../widgets/option_card.dart';
 import '../widgets/progress_bar.dart';
 import '../widgets/question_card.dart';
+import '../widgets/status_view.dart';
 
 class QuestionPage extends StatefulWidget {
   const QuestionPage({super.key, required this.topic});
@@ -21,7 +22,10 @@ class _QuestionPageState extends State<QuestionPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
       context.read<QuestionProvider>().loadQuestions(widget.topic);
     });
   }
@@ -33,77 +37,128 @@ class _QuestionPageState extends State<QuestionPage> {
       body: Consumer<QuestionProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingStateView();
           }
           if (provider.errorMessage != null) {
-            return Center(child: Text(provider.errorMessage!));
+            return ErrorStateView(
+              message: provider.errorMessage!,
+              onRetry: () => provider.loadQuestions(widget.topic),
+            );
           }
           final question = provider.currentQuestion;
           if (question == null) {
-            return const Center(child: Text('暂无题目'));
+            return const EmptyStateView(
+              title: '暂无题目',
+              subtitle: '换个主题试试，或者稍后再来。',
+            );
           }
           final isLast = provider.currentIndex == provider.questions.length - 1;
           final optionLabels = ['A', 'B', 'C', 'D'];
 
-          return ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              ProgressBar(
-                currentIndex: provider.currentIndex,
-                total: provider.questions.length,
-              ),
-              const SizedBox(height: 16),
-              QuestionCard(question: question),
-              const SizedBox(height: 16),
-              ...List.generate(question.options.length, (index) {
-                final option = question.options[index];
-                final selected = provider.selectedOptionIndex == index;
-                final correctIndex = question.correctAnswerIndex;
-                final isCorrect = provider.isAnswered && index == correctIndex;
-                final isIncorrect =
-                    provider.isAnswered && selected && index != correctIndex;
-                return OptionCard(
-                  indexLabel: optionLabels[index],
-                  text: option.optionText,
-                  isSelected: selected,
-                  isCorrect: isCorrect,
-                  isIncorrect: isIncorrect,
-                  isDisabled: provider.isAnswered,
-                  onTap: () => provider.selectOption(index),
-                );
-              }),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  key: const ValueKey('submit-answer'),
-                  onPressed:
-                      provider.selectedOptionIndex == null || provider.isAnswered
-                          ? null
-                          : provider.submitAnswer,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: provider.selectedOptionIndex == null
-                        ? AppTheme.borderGray
-                        : AppTheme.duoGreen,
-                    foregroundColor: Colors.white,
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final horizontalPadding =
+                  width >= 600 ? 32.0 : (width <= 360 ? 16.0 : 20.0);
+
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: ListView(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      20,
+                      horizontalPadding,
+                      20,
+                    ),
+                    children: [
+                      ProgressBar(
+                        currentIndex: provider.currentIndex,
+                        total: provider.questions.length,
+                      ),
+                      const SizedBox(height: 16),
+                      QuestionCard(question: question),
+                      const SizedBox(height: 16),
+                      ...List.generate(question.options.length, (index) {
+                        final option = question.options[index];
+                        final selected = provider.selectedOptionIndex == index;
+                        final correctIndex = question.correctAnswerIndex;
+                        final isCorrect =
+                            provider.isAnswered && index == correctIndex;
+                        final isIncorrect = provider.isAnswered &&
+                            selected &&
+                            index != correctIndex;
+                        return OptionCard(
+                          indexLabel: optionLabels[index],
+                          text: option.optionText,
+                          isSelected: selected,
+                          isCorrect: isCorrect,
+                          isIncorrect: isIncorrect,
+                          isDisabled: provider.isAnswered,
+                          onTap: () => provider.selectOption(index),
+                        );
+                      }),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          key: const ValueKey('submit-answer'),
+                          onPressed: provider.selectedOptionIndex == null ||
+                                  provider.isAnswered
+                              ? null
+                              : provider.submitAnswer,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                provider.selectedOptionIndex == null
+                                    ? AppTheme.borderGray
+                                    : AppTheme.duoGreen,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text(provider.isAnswered ? '已提交' : '提交答案'),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      AnimatedSwitcher(
+                        duration: AppTheme.durationPanel,
+                        switchInCurve: Curves.easeOutBack,
+                        switchOutCurve: Curves.easeIn,
+                        transitionBuilder: (child, animation) {
+                          final slide = Tween<Offset>(
+                            begin: const Offset(0, 0.1),
+                            end: Offset.zero,
+                          ).animate(animation);
+                          return FadeTransition(
+                            opacity: animation,
+                            child:
+                                SlideTransition(position: slide, child: child),
+                          );
+                        },
+                        child: provider.isAnswered
+                            ? FeedbackPanel(
+                                key: ValueKey('feedback-${question.id}'),
+                                isCorrect: provider.lastIsCorrect ?? false,
+                                question: question,
+                                isLast: isLast,
+                                onContinue: () {
+                                  if (isLast) {
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/result',
+                                    );
+                                  } else {
+                                    provider.nextQuestion();
+                                  }
+                                },
+                              )
+                            : const SizedBox.shrink(
+                                key: ValueKey('feedback-empty')),
+                      ),
+                    ],
                   ),
-                  child: Text(provider.isAnswered ? '已提交' : '提交答案'),
                 ),
-              ),
-              if (provider.isAnswered)
-                FeedbackPanel(
-                  isCorrect: provider.lastIsCorrect ?? false,
-                  question: question,
-                  isLast: isLast,
-                  onContinue: () {
-                    if (isLast) {
-                      Navigator.pushReplacementNamed(context, '/result');
-                    } else {
-                      provider.nextQuestion();
-                    }
-                  },
-                ),
-            ],
+              );
+            },
           );
         },
       ),

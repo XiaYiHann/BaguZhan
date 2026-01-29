@@ -2,10 +2,33 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   static const topics = ['JavaScript', 'React', 'Vue'];
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,37 +43,54 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 16),
             Expanded(
               child: ListView.separated(
-                itemCount: topics.length,
+                itemCount: HomePage.topics.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final topic = topics[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/question', arguments: topic);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.black, width: 2),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black,
-                            offset: Offset(0, 4),
-                            blurRadius: 0,
+                  final topic = HomePage.topics[index];
+                  final start = (index * 0.12).clamp(0.0, 0.6);
+                  final animation = CurvedAnimation(
+                    parent: _controller,
+                    curve: Interval(start, 1, curve: Curves.easeOutCubic),
+                  );
+
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.08),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/question',
+                            arguments: topic,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppTheme.surface,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusCard),
+                            border: Border.all(
+                              color: AppTheme.outlineStrong,
+                              width: AppTheme.borderWidth,
+                            ),
+                            boxShadow: const [AppTheme.shadowDown],
                           ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            topic,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                topic,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const Icon(Icons.arrow_forward),
+                            ],
                           ),
-                          const Icon(Icons.arrow_forward),
-                        ],
+                        ),
                       ),
                     ),
                   );
