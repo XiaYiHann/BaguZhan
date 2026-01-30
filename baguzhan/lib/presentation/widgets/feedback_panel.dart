@@ -5,7 +5,7 @@ import '../../data/models/question_model.dart';
 import 'action_buttons.dart';
 import 'duo_card.dart';
 
-class FeedbackPanel extends StatelessWidget {
+class FeedbackPanel extends StatefulWidget {
   const FeedbackPanel({
     super.key,
     required this.isCorrect,
@@ -19,9 +19,34 @@ class FeedbackPanel extends StatelessWidget {
   final VoidCallback onContinue;
   final bool isLast;
 
-  Color get _background =>
-      isCorrect ? AppTheme.correctBackground : AppTheme.incorrectBackground;
-  Color get _textColor => isCorrect ? AppTheme.duoGreen : AppTheme.duoRed;
+  @override
+  State<FeedbackPanel> createState() => _FeedbackPanelState();
+}
+
+class _FeedbackPanelState extends State<FeedbackPanel>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _emojiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _emojiController = AnimationController(
+      vsync: this,
+      duration: AppTheme.durationElastic,
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _emojiController.dispose();
+    super.dispose();
+  }
+
+  Color get _background => widget.isCorrect
+      ? AppTheme.correctBackground
+      : AppTheme.incorrectBackground;
+  Color get _textColor =>
+      widget.isCorrect ? AppTheme.duoGreen : AppTheme.duoRed;
 
   @override
   Widget build(BuildContext context) {
@@ -38,17 +63,32 @@ class FeedbackPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              isCorrect ? '回答正确！' : '回答错误',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: _textColor),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.isCorrect ? '回答正确！' : '回答错误',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(color: _textColor),
+                  ),
+                ),
+                AnimatedScale(
+                  scale: _emojiController.value,
+                  duration: AppTheme.durationElastic,
+                  curve: AppTheme.curveElastic,
+                  child: Text(
+                    widget.isCorrect ? '🎉' : '💪',
+                    style: const TextStyle(fontSize: 32),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
-            if (!isCorrect)
+            if (!widget.isCorrect)
               Text(
-                '正确答案：${question.options[question.correctAnswerIndex].optionText}',
+                '正确答案：${widget.question.options[widget.question.correctAnswerIndex].optionText}',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             const SizedBox(height: 12),
@@ -57,12 +97,12 @@ class FeedbackPanel extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (question.explanation != null)
-                      _Section(title: '解析', content: question.explanation!),
-                    if (question.mnemonic != null)
-                      _Section(title: '助记口诀', content: question.mnemonic!),
-                    if (question.scenario != null)
-                      _Section(title: '实战场景', content: question.scenario!),
+                    if (widget.question.explanation != null)
+                      _Section(title: '解析', content: widget.question.explanation!),
+                    if (widget.question.mnemonic != null)
+                      _Section(title: '助记口诀', content: widget.question.mnemonic!),
+                    if (widget.question.scenario != null)
+                      _Section(title: '实战场景', content: widget.question.scenario!),
                   ],
                 ),
               ),
@@ -70,8 +110,8 @@ class FeedbackPanel extends StatelessWidget {
             const SizedBox(height: 12),
             ActionButtons(
               primaryKey: const ValueKey('continue-button'),
-              primaryLabel: isLast ? '查看结果' : '下一题',
-              onPrimaryPressed: onContinue,
+              primaryLabel: widget.isLast ? '查看结果' : '下一题',
+              onPrimaryPressed: widget.onContinue,
             ),
           ],
         ),

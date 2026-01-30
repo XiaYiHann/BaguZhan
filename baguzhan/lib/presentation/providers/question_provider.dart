@@ -32,6 +32,13 @@ class QuestionProvider extends ChangeNotifier {
   DateTime? _questionStartTime;
   String? _userId;
 
+  // 连击状态 (M3新增)
+  int _currentStreak = 0;
+  int _maxStreak = 0;
+
+  int get currentStreak => _currentStreak;
+  int get maxStreak => _maxStreak;
+
   void setUserId(String userId) {
     _userId = userId;
   }
@@ -66,6 +73,7 @@ class QuestionProvider extends ChangeNotifier {
       incorrectCount = 0;
       answers.clear();
       _questionStartTime = DateTime.now();
+      _currentStreak = 0; // 重置连击 (M3新增)
       _state = QuestionState.loaded;
     } catch (error) {
       _errorMessage = _parseError(error);
@@ -91,8 +99,13 @@ class QuestionProvider extends ChangeNotifier {
     lastIsCorrect = selectedOptionIndex == correctIndex;
     if (lastIsCorrect == true) {
       correctCount += 1;
+      _currentStreak += 1; // 答对递增连击 (M3新增)
+      if (_currentStreak > _maxStreak) {
+        _maxStreak = _currentStreak; // 更新最大连击 (M3新增)
+      }
     } else {
       incorrectCount += 1;
+      _currentStreak = 0; // 答错重置连击 (M3新增)
     }
     final duration = _questionStartTime == null
         ? Duration.zero

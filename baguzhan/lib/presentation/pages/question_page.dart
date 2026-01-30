@@ -18,16 +18,35 @@ class QuestionPage extends StatefulWidget {
   State<QuestionPage> createState() => _QuestionPageState();
 }
 
-class _QuestionPageState extends State<QuestionPage> {
+class _QuestionPageState extends State<QuestionPage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseController;
+
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: AppTheme.durationPulse,
+    )..forward();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
       context.read<QuestionProvider>().loadQuestions(widget.topic);
     });
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  // 检测是否在测试环境中
+  static bool _isTestMode() {
+    return bool.fromEnvironment('dart.vm.product') == false;
   }
 
   @override
@@ -80,6 +99,7 @@ class _QuestionPageState extends State<QuestionPage> {
                       ProgressBar(
                         currentIndex: provider.currentIndex,
                         total: provider.questions.length,
+                        streak: provider.currentStreak,
                       ),
                       const SizedBox(height: 16),
                       QuestionCard(question: question),
@@ -104,23 +124,48 @@ class _QuestionPageState extends State<QuestionPage> {
                         );
                       }),
                       const SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          key: const ValueKey('submit-answer'),
-                          onPressed: provider.selectedOptionIndex == null ||
-                                  provider.isAnswered
-                              ? null
-                              : provider.submitAnswer,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                provider.selectedOptionIndex == null
-                                    ? AppTheme.borderGray
-                                    : AppTheme.duoGreen,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: Text(provider.isAnswered ? '已提交' : '提交答案'),
-                        ),
+                      AnimatedBuilder(
+                        animation: _pulseController,
+                        builder: (context, child) {
+                          final isEnabled = provider.selectedOptionIndex != null &&
+                              !provider.isAnswered;
+                          final pulseValue = Curves.easeInOutSine
+                              .transform(_pulseController.value);
+                          return Container(
+                            decoration: BoxDecoration(
+                              boxShadow: isEnabled
+                                  ? [
+                                      BoxShadow(
+                                        color: AppTheme.duoGreen
+                                            .withValues(alpha: 0.4),
+                                        offset: const Offset(0, 4),
+                                        blurRadius: 8 + (4 * pulseValue),
+                                      ),
+                                    ]
+                                  : [AppTheme.shadowDown],
+                              ),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                key: const ValueKey('submit-answer'),
+                                onPressed: provider.selectedOptionIndex == null ||
+                                        provider.isAnswered
+                                    ? null
+                                    : provider.submitAnswer,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: provider.selectedOptionIndex ==
+                                          null
+                                      ? AppTheme.borderGray
+                                      : AppTheme.duoGreen,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                    provider.isAnswered ? '已提交' : '提交答案'),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       AnimatedSwitcher(

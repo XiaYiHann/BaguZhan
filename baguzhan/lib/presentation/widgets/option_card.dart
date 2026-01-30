@@ -108,6 +108,7 @@ class _OptionCardState extends State<OptionCard> {
     final style = _styles[_visualState]!;
     final shadow = _pressed ? AppTheme.shadowPressed : AppTheme.shadowDown;
     final translateY = _pressed ? 2.0 : 0.0;
+    final scale = widget.isSelected && !widget.isDisabled ? 1.02 : 1.0;
 
     return GestureDetector(
       onTap: widget.isDisabled
@@ -119,49 +120,54 @@ class _OptionCardState extends State<OptionCard> {
       onTapDown: (_) => _setPressed(true),
       onTapUp: (_) => _setPressed(false),
       onTapCancel: () => _setPressed(false),
-      child: AnimatedContainer(
-        duration: AppTheme.durationPress,
+      child: AnimatedScale(
+        scale: scale,
+        duration: AppTheme.durationFast,
         curve: AppTheme.curvePress,
-        transform: Matrix4.translationValues(0, translateY, 0),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: style.backgroundColor,
-          borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-          border:
-              Border.all(color: style.borderColor, width: AppTheme.borderWidth),
-          boxShadow: [shadow],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: style.indexBackgroundColor,
-                borderRadius: BorderRadius.circular(AppTheme.radiusChip),
-                border: Border.all(
-                  color: style.borderColor,
-                  width: AppTheme.borderWidth,
+        child: AnimatedContainer(
+          duration: AppTheme.durationPress,
+          curve: AppTheme.curvePress,
+          transform: Matrix4.translationValues(0, translateY, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: style.backgroundColor,
+            borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+            border:
+                Border.all(color: style.borderColor, width: AppTheme.borderWidth),
+            boxShadow: [shadow],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: style.indexBackgroundColor,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusChip),
+                  border: Border.all(
+                    color: style.borderColor,
+                    width: AppTheme.borderWidth,
+                  ),
+                ),
+                child: Text(
+                  widget.indexLabel,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: style.indexTextColor,
+                  ),
                 ),
               ),
-              child: Text(
-                widget.indexLabel,
-                style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  color: style.indexTextColor,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  widget.text,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                widget.text,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

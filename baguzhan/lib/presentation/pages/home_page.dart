@@ -1,11 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../widgets/duo_card.dart';
+import '../widgets/topic_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   static const topics = ['JavaScript', 'React', 'Vue'];
+
+  static const topicProgress = {
+    'JavaScript': 5,
+    'React': 3,
+    'Vue': 2,
+  };
+
+  static const topicDifficulty = {
+    'JavaScript': '简单',
+    'React': '中等',
+    'Vue': '中等',
+  };
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -70,6 +85,8 @@ class _HomePageState extends State<HomePage>
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final topic = HomePage.topics[index];
+                  final completedCount = HomePage.topicProgress[topic] ?? 0;
+                  final difficulty = HomePage.topicDifficulty[topic];
                   final start = (index * 0.12).clamp(0.0, 0.6);
                   final animation = CurvedAnimation(
                     parent: _controller,
@@ -83,7 +100,11 @@ class _HomePageState extends State<HomePage>
                         begin: const Offset(0, 0.08),
                         end: Offset.zero,
                       ).animate(animation),
-                      child: GestureDetector(
+                      child: TopicCard(
+                        topic: topic,
+                        completedCount: completedCount,
+                        totalCount: 10,
+                        difficulty: difficulty,
                         onTap: () {
                           Navigator.pushNamed(
                             context,
@@ -91,19 +112,6 @@ class _HomePageState extends State<HomePage>
                             arguments: topic,
                           );
                         },
-                        child: DuoCard(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                topic,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const Icon(Icons.arrow_forward),
-                            ],
-                          ),
-                        ),
                       ),
                     ),
                   );
@@ -117,7 +125,7 @@ class _HomePageState extends State<HomePage>
   }
 }
 
-class _QuickActionButton extends StatelessWidget {
+class _QuickActionButton extends StatefulWidget {
   const _QuickActionButton({
     required this.icon,
     required this.label,
@@ -131,24 +139,43 @@ class _QuickActionButton extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
+  State<_QuickActionButton> createState() => _QuickActionButtonState();
+}
+
+class _QuickActionButtonState extends State<_QuickActionButton> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: DuoCard(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[800],
+      onTap: widget.onTap,
+      onTapDown: (_) {
+        HapticFeedback.lightImpact();
+        setState(() => _isPressed = true);
+      },
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: AppTheme.durationPress,
+        curve: AppTheme.curvePress,
+        transform: Matrix4.translationValues(0, _isPressed ? 2 : 0, 0),
+        child: DuoCard(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          boxShadow: _isPressed ? [AppTheme.shadowPressed] : [AppTheme.shadowDown],
+          child: Column(
+            children: [
+              Icon(widget.icon, color: widget.color, size: 32),
+              const SizedBox(height: 8),
+              Text(
+                widget.label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[800],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

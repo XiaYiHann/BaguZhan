@@ -12,6 +12,7 @@ import 'presentation/pages/wrong_book_page.dart';
 import 'presentation/providers/learning_progress_provider.dart';
 import 'presentation/providers/question_provider.dart';
 import 'presentation/providers/wrong_book_provider.dart';
+import 'routes/page_transitions.dart';
 
 void main() {
   runApp(const BaguzhanApp());
@@ -44,22 +45,22 @@ class BaguzhanApp extends StatelessWidget {
         onGenerateRoute: (settings) {
           if (settings.name == '/question') {
             final topic = settings.arguments as String? ?? 'JavaScript';
-            return MaterialPageRoute(
-              builder: (_) => QuestionPage(topic: topic),
+            return DuoPageTransition(
+              child: QuestionPage(topic: topic),
             );
           }
           if (settings.name == '/result') {
-            return MaterialPageRoute(builder: (_) => const ResultPage());
+            return DuoPageTransition(child: const ResultPage());
           }
           if (settings.name == '/wrong-book') {
-            return MaterialPageRoute(builder: (_) => const WrongBookPage());
+            return DuoPageTransition(child: const WrongBookPage());
           }
           if (settings.name == '/learning-report') {
-            return MaterialPageRoute(
-              builder: (_) => const LearningReportPage(),
+            return DuoPageTransition(
+              child: const LearningReportPage(),
             );
           }
-          return MaterialPageRoute(builder: (_) => const HomePage());
+          return DuoPageTransition(child: const HomePage());
         },
       ),
     );

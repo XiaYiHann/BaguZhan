@@ -19,7 +19,9 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    // 使用 pump() 而不是 pumpAndSettle() 避免无限动画等待
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('JavaScript'), findsWidgets);
     expect(find.byType(QuestionPage), findsOneWidget);
@@ -38,14 +40,16 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     await tester.tap(find.text('A').first);
     await tester.pump();
     final submitFinder = find.byKey(const ValueKey('submit-answer'));
     await tester.scrollUntilVisible(submitFinder, 200);
     await tester.tap(submitFinder);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.textContaining('回答'), findsOneWidget);
   });
