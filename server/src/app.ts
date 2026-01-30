@@ -13,6 +13,9 @@ import { QuestionRepository } from './repositories/QuestionRepository';
 import { QuestionService } from './services/QuestionService';
 import { UserProgressRepository } from './repositories/UserProgressRepository';
 import { UserProgressService } from './services/UserProgressService';
+import { PathRepository } from './repositories/PathRepository';
+import { PathService } from './services/PathService';
+import { createPathRouter } from './routes/paths';
 
 export const createApp = (db?: DbClient) => {
   const app = express();
@@ -25,6 +28,9 @@ export const createApp = (db?: DbClient) => {
 
   const userProgressRepository = new UserProgressRepository(database);
   const userProgressService = new UserProgressService(userProgressRepository);
+
+  const pathRepository = new PathRepository(database);
+  const pathService = new PathService(pathRepository);
   app.use(cors());
   app.use(express.json());
   app.use(morgan('dev'));
@@ -32,6 +38,7 @@ export const createApp = (db?: DbClient) => {
   app.use('/health', createHealthRouter(healthController));
   app.use('/questions', createQuestionRouter(questionController));
   app.use('/api', createUserProgressRouter(userProgressService));
+  app.use('/api/paths', createPathRouter(pathService));
 
   app.use((_req, res) => {
     res.status(404).json({

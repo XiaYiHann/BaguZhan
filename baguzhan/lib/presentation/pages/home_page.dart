@@ -153,7 +153,7 @@ class _HomePageState extends State<HomePage>
                                 onTap: () {
                                   Navigator.pushNamed(
                                     context,
-                                    '/question',
+                                    '/path-categories',
                                     arguments: topic,
                                   );
                                 },

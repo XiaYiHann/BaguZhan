@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/app_theme.dart';
+import 'data/repositories/api_path_repository.dart';
 import 'data/repositories/api_question_repository.dart';
+import 'data/repositories/path_repository.dart';
 import 'data/repositories/user_progress_repository.dart';
 import 'presentation/pages/achievement_gallery_page.dart';
 import 'presentation/pages/celebration_page.dart';
 import 'presentation/pages/home_page.dart';
+import 'presentation/pages/learning_path_map_page.dart';
 import 'presentation/pages/learning_report_page.dart';
 import 'presentation/pages/neo_components_showcase_page.dart';
+import 'presentation/pages/path_category_page.dart'
+    show PathCategoryPage, TechStackModel;
 import 'presentation/pages/progress_dashboard_page.dart';
 import 'presentation/pages/question_page.dart';
 import 'presentation/pages/result_page.dart';
 import 'presentation/pages/wrong_book_page.dart';
+import 'presentation/providers/learning_path_provider.dart';
 import 'presentation/providers/learning_progress_provider.dart';
 import 'presentation/providers/question_provider.dart';
 import 'presentation/providers/wrong_book_provider.dart';
@@ -24,6 +30,15 @@ void main() {
 
 class BaguzhanApp extends StatelessWidget {
   const BaguzhanApp({super.key});
+
+  String _getTopicIcon(String topic) {
+    const icons = {
+      'JavaScript': '⚡',
+      'React': '⚛️',
+      'Vue': '🌿',
+    };
+    return icons[topic] ?? '📚';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +55,9 @@ class BaguzhanApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => LearningProgressProvider(ApiUserProgressRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LearningPathProvider(ApiPathRepository()),
         ),
       ],
       child: MaterialApp(
@@ -75,6 +93,32 @@ class BaguzhanApp extends StatelessWidget {
           }
           if (settings.name == '/components-showcase') {
             return DuoPageTransition(child: const NeoComponentsShowcasePage());
+          }
+          if (settings.name == '/path-categories') {
+            final topic = settings.arguments as String? ?? 'JavaScript';
+            final techStack = TechStackModel(
+              id: topic.toLowerCase(),
+              name: topic,
+              icon: _getTopicIcon(topic),
+              description: '$topic 学习路径',
+            );
+            return DuoPageTransition(
+              child: PathCategoryPage(techStack: techStack),
+            );
+          }
+          if (settings.name == '/path-map') {
+            final args = settings.arguments as Map<String, dynamic>?;
+            final techStack = args?['techStack'] as TechStackModel?;
+            final categoryId = args?['categoryId'] as String?;
+            if (techStack != null && categoryId != null) {
+              return DuoPageTransition(
+                child: LearningPathMapPage(
+                  techStack: techStack,
+                  categoryId: categoryId,
+                ),
+              );
+            }
+            return DuoPageTransition(child: const HomePage());
           }
           return DuoPageTransition(child: const HomePage());
         },
