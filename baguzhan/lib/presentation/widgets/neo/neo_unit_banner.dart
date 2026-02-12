@@ -54,7 +54,7 @@ class NeoUnitBanner extends StatelessWidget {
           Text(
             'Unit $unit, Part $unit: $topic',
             style: NeoBrutalTheme.styleHeadlineSmall.copyWith(
-              color: Colors.white,
+              color: NeoBrutalTheme.charcoal, // 黑色而非白色
               fontSize: 18,
             ),
           ),

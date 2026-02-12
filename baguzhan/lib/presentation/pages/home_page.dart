@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme/neo_brutal_theme.dart';
 import '../widgets/neo/neo_bottom_nav.dart';
-import '../widgets/neo/neo_button.dart';
-// import '../widgets/neo/neo_card.dart';
 import '../widgets/neo/neo_container.dart';
 import '../widgets/neo/neo_stat_bar.dart';
 

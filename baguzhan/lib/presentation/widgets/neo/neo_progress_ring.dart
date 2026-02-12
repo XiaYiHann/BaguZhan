@@ -250,7 +250,7 @@ class NeoProgressButton extends StatelessWidget {
                           ],
                         )
                       : const Icon(
-                          Icons.play_arrow,
+                          Icons.star,
                           color: Colors.white,
                           size: 36,
                         ),

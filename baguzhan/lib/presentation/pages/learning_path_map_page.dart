@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/neo_brutal_theme.dart';
-import '../widgets/neo/neo_stat_bar.dart';
 import '../widgets/neo/neo_bottom_nav.dart';
+import '../widgets/neo/neo_path_node.dart';
+import '../widgets/neo/neo_stat_bar.dart';
 import '../widgets/path/character_dialog_widget.dart';
-import '../widgets/path/path_line_painter.dart';
-import '../widgets/path/path_node_widget.dart';
+import '../widgets/path/path_node_widget.dart'; // 保留数据模型
 import 'path_category_page.dart';
 
 /// 学习路径地图页面
@@ -390,16 +390,24 @@ class _LearningPathMapPageState extends State<LearningPathMapPage> {
     required Alignment alignment,
     required bool isLast,
   }) {
+    // 将 NodeStatus 转换为 PathNodeStatus
+    final pathNodeStatus = _mapNodeStatus(node.status);
+
     return Container(
       margin: const EdgeInsets.only(bottom: NeoBrutalTheme.spaceLg),
       child: Stack(
         children: [
-          // 节点组件
-          PathNodeWidget(
-            node: node,
+          // 节点组件 - 使用 NeoPathNode
+          Align(
             alignment: alignment,
-            onTap: () => _onNodeTap(node),
-            size: 72,
+            child: NeoPathNode(
+              status: pathNodeStatus,
+              label: node.title,
+              size: 72,
+              onTap: node.status != NodeStatus.locked
+                  ? () => _onNodeTap(node)
+                  : null,
+            ),
           ),
 
           // 如果不是最后一个节点，显示连接线
@@ -409,10 +417,7 @@ class _LearningPathMapPageState extends State<LearningPathMapPage> {
               right: 0,
               top: 80, // 节点下方
               child: Center(
-                child: PathLineWidget(
-                  completedSegments:
-                      node.status == NodeStatus.completed ? 1 : 0,
-                  totalSegments: 1,
+                child: NeoPathConnection(
                   height: 60,
                 ),
               ),
@@ -420,5 +425,18 @@ class _LearningPathMapPageState extends State<LearningPathMapPage> {
         ],
       ),
     );
+  }
+
+  /// 将旧的 NodeStatus 映射到新的 PathNodeStatus
+  PathNodeStatus _mapNodeStatus(NodeStatus status) {
+    switch (status) {
+      case NodeStatus.completed:
+        return PathNodeStatus.completed;
+      case NodeStatus.current:
+      case NodeStatus.unlocked:
+        return PathNodeStatus.current;
+      case NodeStatus.locked:
+        return PathNodeStatus.locked;
+    }
   }
 }

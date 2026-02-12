@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import '../../core/theme/neo_brutal_theme.dart';
 import '../providers/learning_progress_provider.dart';
 import '../widgets/neo/neo_bottom_nav.dart';
-import '../widgets/neo/neo_container.dart';
 import '../widgets/neo/neo_icon_button.dart';
 import '../widgets/neo/neo_progress_ring.dart';
 import '../widgets/neo/neo_stat_bar.dart';
@@ -68,8 +67,8 @@ class _ProgressDashboardPageState extends State<ProgressDashboardPage> {
                             NeoProgressButton(
                               progress: 0.75,
                               size: 160,
-                              buttonIcon: Icons.play_arrow,
-                              buttonLabel: 'START',
+                              buttonIcon: Icons.star,
+                              buttonLabel: 'SLASH!',
                               onPressed: () {
                                 // 跳转到答题页面
                                 Navigator.of(context).pushNamed('/quiz');

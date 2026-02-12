@@ -23,6 +23,7 @@ class StatMetric {
 /// Neo-Brutal 顶部统计栏
 ///
 /// 横向展示 4 个核心统计指标：连续天数、正确率、总题数、积分
+/// 每个统计项都是独立的白色卡片，带边框和阴影
 class NeoStatBar extends StatelessWidget {
   const NeoStatBar({
     super.key,
@@ -79,11 +80,14 @@ class NeoStatBar extends StatelessWidget {
       child: Row(
         children: metrics.map((metric) {
           return Expanded(
-            child: _MetricItem(
-              icon: metric.icon,
-              value: metric.value,
-              suffix: metric.suffix,
-              color: metric.color,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _MetricCard(
+                icon: metric.icon,
+                value: metric.value,
+                suffix: metric.suffix,
+                color: metric.color,
+              ),
             ),
           );
         }).toList(),
@@ -92,8 +96,9 @@ class NeoStatBar extends StatelessWidget {
   }
 }
 
-class _MetricItem extends StatelessWidget {
-  const _MetricItem({
+/// 统计卡片 - 白色背景+边框+阴影
+class _MetricCard extends StatelessWidget {
+  const _MetricCard({
     required this.icon,
     required this.value,
     required this.suffix,
@@ -107,24 +112,39 @@ class _MetricItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          color: color,
-          size: 24,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: NeoBrutalTheme.charcoal,
+          width: NeoBrutalTheme.borderWidth,
         ),
-        const SizedBox(height: 2),
-        Text(
-          suffix.isEmpty ? value : '$value$suffix',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: NeoBrutalTheme.charcoal,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: NeoBrutalTheme.shadowSm,
+      ),
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: 4,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: color,
+            size: 20,
           ),
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            suffix.isEmpty ? value : '$value$suffix',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: NeoBrutalTheme.charcoal,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
