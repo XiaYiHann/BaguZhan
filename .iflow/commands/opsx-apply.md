@@ -1,7 +1,7 @@
 ---
 name: /opsx-apply
 id: opsx-apply
-category: Workflow
+category: 工作流
 description: 实现 OpenSpec 变更中的任务（实验性）
 ---
 
@@ -24,9 +24,9 @@ description: 实现 OpenSpec 变更中的任务（实验性）
    ```bash
    openspec-cn status --change "<name>" --json
    ```
-   Parse the JSON to understand:
-   - `schemaName`: The workflow being used (e.g., "spec-driven")
-   - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
+   解析 JSON 以了解：
+   - `schemaName`：正在使用的工作流（例如："spec-driven"）
+   - 哪个产出物包含任务（对于 spec-driven 通常是 "tasks"，检查其他产出物的状态）
 
 3. **获取应用指令**
 
@@ -50,7 +50,7 @@ description: 实现 OpenSpec 变更中的任务（实验性）
    阅读 apply instructions 输出中 `contextFiles` 列出的文件。
    文件取决于正在使用的 Schema：
    - **spec-driven**: proposal, specs, design, tasks
-   - Other schemas: follow the contextFiles from CLI output
+   - 其他模式：遵循 CLI 输出中的 contextFiles
 
 5. **显示当前进度**
 

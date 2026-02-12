@@ -5,12 +5,15 @@ import morgan from 'morgan';
 import { openDatabase, type DbClient } from './database/connection';
 import { HealthController } from './controllers/HealthController';
 import { QuestionController } from './controllers/QuestionController';
+import { AdminController } from './controllers/AdminController';
 import { errorHandler } from './middlewares/errorHandler';
 import { createHealthRouter } from './routes/health';
 import { createQuestionRouter } from './routes/questions';
 import { createUserProgressRouter } from './routes/userProgress';
+import { createAdminRouter } from './routes/admin';
 import { QuestionRepository } from './repositories/QuestionRepository';
 import { QuestionService } from './services/QuestionService';
+import { AdminService } from './services/AdminService';
 import { UserProgressRepository } from './repositories/UserProgressRepository';
 import { UserProgressService } from './services/UserProgressService';
 import { PathRepository } from './repositories/PathRepository';
@@ -26,6 +29,9 @@ export const createApp = (db?: DbClient) => {
   const questionController = new QuestionController(questionService);
   const healthController = new HealthController();
 
+  const adminService = new AdminService(questionRepository);
+  const adminController = new AdminController(adminService);
+
   const userProgressRepository = new UserProgressRepository(database);
   const userProgressService = new UserProgressService(userProgressRepository);
 
@@ -35,10 +41,13 @@ export const createApp = (db?: DbClient) => {
   app.use(express.json());
   app.use(morgan('dev'));
 
+  // 注意：更具体的路由路径应该先注册
+  // /api/admin 必须在 /api 之前注册，否则会被 /api 的中间件拦截
   app.use('/health', createHealthRouter(healthController));
   app.use('/questions', createQuestionRouter(questionController));
-  app.use('/api', createUserProgressRouter(userProgressService));
+  app.use('/api/admin', createAdminRouter(adminController));
   app.use('/api/paths', createPathRouter(pathService));
+  app.use('/api', createUserProgressRouter(userProgressService));
 
   app.use((_req, res) => {
     res.status(404).json({

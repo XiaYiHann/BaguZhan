@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import 'interceptors/error_interceptor.dart';
+import 'interceptors/auth_interceptor.dart';
 
 class ApiClient {
   ApiClient({Dio? dio}) : _dio = dio ?? _createDio();
@@ -36,6 +37,8 @@ class ApiClient {
       );
     }
 
+    // 认证拦截器 - 必须在错误拦截器之前添加
+    dio.interceptors.add(AuthInterceptor());
     dio.interceptors.add(ErrorInterceptor());
 
     return dio;

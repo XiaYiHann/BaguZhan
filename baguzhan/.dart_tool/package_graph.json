@@ -11,7 +11,8 @@
         "flutter",
         "flutter_svg",
         "provider",
-        "shared_preferences"
+        "shared_preferences",
+        "uuid"
       ],
       "devDependencies": [
         "build_runner",
@@ -910,6 +911,15 @@
       "dependencies": [
         "meta",
         "path"
+      ]
+    },
+    {
+      "name": "uuid",
+      "version": "4.5.2",
+      "dependencies": [
+        "crypto",
+        "fixnum",
+        "meta"
       ]
     }
   ],

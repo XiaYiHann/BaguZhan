@@ -1,26 +1,29 @@
 import { Router } from 'express';
 import type { UserProgressService } from '../services/UserProgressService';
 import { asyncHandler } from '../middlewares/asyncHandler';
+import { validateDeviceId } from '../middleware/deviceId';
 
 export const createUserProgressRouter = (
   service: UserProgressService
 ): Router => {
   const router = Router();
 
+  // 对所有用户进度相关路由应用设备 ID 验证
+  router.use(validateDeviceId);
+
   // Record an answer
   router.post(
     '/answers',
     asyncHandler(async (req, res) => {
-      const { userId, questionId, selectedOptionId, isCorrect, answerTimeMs } =
-        req.body;
+      const { questionId, selectedOptionId, isCorrect, answerTimeMs } = req.body;
 
-      if (!userId || !questionId || !selectedOptionId || typeof isCorrect !== 'boolean') {
+      if (!questionId || !selectedOptionId || typeof isCorrect !== 'boolean') {
         res.status(400).json({ error: 'Missing required fields' });
         return;
       }
 
       const answer = await service.recordAnswer({
-        userId,
+        userId: req.deviceId!,
         questionId,
         selectedOptionId,
         isCorrect,
@@ -35,15 +38,10 @@ export const createUserProgressRouter = (
   router.get(
     '/answers',
     asyncHandler(async (req, res) => {
-      const { userId, limit = '20', offset = '0' } = req.query;
-
-      if (!userId || typeof userId !== 'string') {
-        res.status(400).json({ error: 'userId is required' });
-        return;
-      }
+      const { limit = '20', offset = '0' } = req.query;
 
       const result = await service.getAnswerHistory({
-        userId,
+        userId: req.deviceId!,
         limit: parseInt(limit as string, 10),
         offset: parseInt(offset as string, 10),
       });
@@ -56,15 +54,10 @@ export const createUserProgressRouter = (
   router.get(
     '/wrong-book',
     asyncHandler(async (req, res) => {
-      const { userId, isMastered } = req.query;
-
-      if (!userId || typeof userId !== 'string') {
-        res.status(400).json({ error: 'userId is required' });
-        return;
-      }
+      const { isMastered } = req.query;
 
       const wrongBooks = await service.getWrongBooks({
-        userId,
+        userId: req.deviceId!,
         isMastered:
           isMastered === 'true' ? true : isMastered === 'false' ? false : undefined,
       });
@@ -103,14 +96,7 @@ export const createUserProgressRouter = (
   router.get(
     '/progress',
     asyncHandler(async (req, res) => {
-      const { userId } = req.query;
-
-      if (!userId || typeof userId !== 'string') {
-        res.status(400).json({ error: 'userId is required' });
-        return;
-      }
-
-      const progress = await service.getProgress(userId);
+      const progress = await service.getProgress(req.deviceId!);
       res.json(progress);
     })
   );
@@ -119,14 +105,7 @@ export const createUserProgressRouter = (
   router.get(
     '/progress/stats',
     asyncHandler(async (req, res) => {
-      const { userId } = req.query;
-
-      if (!userId || typeof userId !== 'string') {
-        res.status(400).json({ error: 'userId is required' });
-        return;
-      }
-
-      const stats = await service.getDetailedStats(userId);
+      const stats = await service.getDetailedStats(req.deviceId!);
       res.json(stats);
     })
   );

@@ -1,8 +1,13 @@
 import path from 'node:path';
 import sqlite3 from 'sqlite3';
 
+export type RunResult = {
+  lastID: number;
+  changes: number;
+};
+
 export type DbClient = {
-  run: (sql: string, params?: unknown[]) => Promise<void>;
+  run: (sql: string, params?: unknown[]) => Promise<RunResult>;
   get: <T = unknown>(sql: string, params?: unknown[]) => Promise<T | undefined>;
   all: <T = unknown>(sql: string, params?: unknown[]) => Promise<T[]>;
   close: () => Promise<void>;
@@ -10,13 +15,13 @@ export type DbClient = {
 
 const createClient = (db: sqlite3.Database): DbClient => {
   const run = (sql: string, params: unknown[] = []) =>
-    new Promise<void>((resolve, reject) => {
-      db.run(sql, params, (err) => {
+    new Promise<RunResult>((resolve, reject) => {
+      db.run(sql, params, function (err) {
         if (err) {
           reject(err);
           return;
         }
-        resolve();
+        resolve({ lastID: this.lastID, changes: this.changes });
       });
     });
 

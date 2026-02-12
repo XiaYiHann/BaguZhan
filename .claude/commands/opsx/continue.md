@@ -1,7 +1,7 @@
 ---
-name: "OPSX: Continue"
+name: "OPSX: 继续"
 description: 继续处理变更 - 创建下一个产出物（实验性）
-category: Workflow
+category: 工作流
 tags: [workflow, artifacts, experimental]
 ---
 
@@ -29,10 +29,10 @@ tags: [workflow, artifacts, experimental]
    ```bash
    openspec-cn status --change "<name>" --json
    ```
-   Parse the JSON to understand current state. The response includes:
-   - `schemaName`: The workflow schema being used (e.g., "spec-driven")
-   - `artifacts`: Array of artifacts with their status ("done", "ready", "blocked")
-   - `isComplete`: Boolean indicating if all artifacts are complete
+   解析 JSON 以了解当前状态。响应包括：
+   - `schemaName`：正在使用的工作流 schema（例如："spec-driven"）
+   - `artifacts`：产出物数组及其状态（"done"、"ready"、"blocked"）
+   - `isComplete`：布尔值，表示是否所有产出物都已完成
 
 3. **根据状态行动**：
 
@@ -93,22 +93,22 @@ tags: [workflow, artifacts, experimental]
 
 常见的产出物模式：
 
-**spec-driven schema** (proposal → specs → design → tasks):
-- **proposal.md**: Ask user about the change if not clear. Fill in Why, What Changes, Capabilities, Impact.
-  - The Capabilities section is critical - each capability listed will need a spec file.
-- **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
-- **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
+**spec-driven schema**（proposal → specs → design → tasks）：
+- **proposal.md**：如果变更不清楚，先向用户确认。填写“为什么”“什么变化”“能力”“影响”。
+  - “能力”部分很关键——列出的每个能力都需要一个 spec 文件。
+- **specs/<capability>/spec.md**：为提案“能力”部分列出的每个能力创建一个 spec（使用 capability 名称，而不是 change 名称）。
+- **design.md**：记录技术决策、架构和实现方法。
+- **tasks.md**：把实现拆分为带复选框的任务。
 
-For other schemas, follow the `instruction` field from the CLI output.
+对于其他 schema，遵循 CLI 输出中的 `instruction` 字段。
 
-**Guardrails**
-- Create ONE artifact per invocation
-- Always read dependency artifacts before creating a new one
-- Never skip artifacts or create out of order
-- If context is unclear, ask the user before creating
-- Verify the artifact file exists after writing before marking progress
-- Use the schema's artifact sequence, don't assume specific artifact names
-- **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
-  - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+**护栏**
+- 每次调用只创建一个产出物
+- 创建新产出物前，总是先阅读依赖产出物
+- 不要跳过产出物，也不要乱序创建
+- 如果上下文不清楚，创建前先询问用户
+- 写入后先确认产出物文件存在，再标记进度
+- 使用 schema 的产出物顺序，不要假设固定的产出物名称
+- **重要**：`context` 和 `rules` 是对你的约束，不是文件内容
+  - 不要把 `<context>`、`<rules>`、`<project_context>` 块复制进产出物
+  - 它们用于指导你写作，但绝不能出现在输出中

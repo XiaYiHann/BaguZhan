@@ -21,24 +21,27 @@ class ApiPathRepository implements PathRepository {
   Future<LearningPathModel> getLearningPath(String techStack) async {
     final response = await _withRetry(() {
       return _client.dio.get(
-        '/api/learning-paths/$techStack',
+        '/api/paths/tech/$techStack',
       );
     });
 
-    return LearningPathModel.fromJson(response.data as Map<String, dynamic>);
+    final data = response.data as Map<String, dynamic>;
+    return _parseLearningPathResponse(data);
   }
 
   @override
   Future<List<PathCategoryModel>> getPathCategories(String techStack) async {
+    // 先获取路径，再获取分类
     final response = await _withRetry(() {
       return _client.dio.get(
-        '/api/learning-paths/$techStack/categories',
+        '/api/paths/tech/$techStack',
       );
     });
 
-    final data = response.data as List<dynamic>;
-    return data
-        .map((item) => PathCategoryModel.fromJson(item as Map<String, dynamic>))
+    final data = response.data as Map<String, dynamic>;
+    final categories = data['categories'] as List<dynamic>? ?? [];
+    return categories
+        .map((item) => _parseCategoryFromApi(item as Map<String, dynamic>))
         .toList();
   }
 
@@ -46,13 +49,14 @@ class ApiPathRepository implements PathRepository {
   Future<List<PathNodeModel>> getCategoryNodes(String categoryId) async {
     final response = await _withRetry(() {
       return _client.dio.get(
-        '/api/categories/$categoryId/nodes',
+        '/api/paths/categories/$categoryId/nodes',
       );
     });
 
-    final data = response.data as List<dynamic>;
-    return data
-        .map((item) => PathNodeModel.fromJson(item as Map<String, dynamic>))
+    final data = response.data as Map<String, dynamic>;
+    final nodes = data['nodes'] as List<dynamic>? ?? [];
+    return nodes
+        .map((item) => _parseNodeFromApi(item as Map<String, dynamic>))
         .toList();
   }
 
@@ -60,7 +64,8 @@ class ApiPathRepository implements PathRepository {
   Future<List<QuestionModel>> getNodeQuestions(String nodeId) async {
     final response = await _withRetry(() {
       return _client.dio.get(
-        '/api/nodes/$nodeId/questions',
+        '/api/questions',
+        queryParameters: {'nodeId': nodeId},
       );
     });
 
@@ -80,19 +85,20 @@ class ApiPathRepository implements PathRepository {
     try {
       final response = await _withRetry(() {
         return _client.dio.post(
-          '/api/nodes/$nodeId/complete',
+          '/api/paths/nodes/$nodeId/complete',
           data: {
-            'userId': userId,
             'correctCount': correctCount,
             'totalCount': totalCount,
           },
+          options: Options(
+            headers: {'X-Device-ID': userId},
+          ),
         );
       });
 
-      // 根据响应判断是否成功
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>?;
-        return data?['success'] as bool? ?? true;
+        return data?['node'] != null;
       }
       return false;
     } on ApiException {
@@ -132,5 +138,112 @@ class ApiPathRepository implements PathRepository {
       return origin;
     }
     return ApiException(message: '网络异常，请稍后重试');
+  }
+
+  // ============ API 响应解析方法 ============
+
+  /// 解析学习路径响应
+  LearningPathModel _parseLearningPathResponse(Map<String, dynamic> data) {
+    final pathData = data['path'] as Map<String, dynamic>? ?? data;
+    final categories = data['categories'] as List<dynamic>? ?? [];
+    final progress = data['progress'] as Map<String, dynamic>?;
+
+    // 计算总节点数和已完成节点数
+    int totalNodes = 0;
+    int completedNodes = 0;
+    final parsedCategories = <PathCategoryModel>[];
+
+    for (final cat in categories) {
+      final catMap = cat as Map<String, dynamic>;
+      final parsedCat = _parseCategoryFromApi(catMap);
+      parsedCategories.add(parsedCat);
+      totalNodes += parsedCat.totalNodes;
+      completedNodes += parsedCat.completedNodes;
+    }
+
+    // 如果有进度数据，使用进度数据
+    if (progress != null) {
+      totalNodes = progress['totalNodes'] as int? ?? totalNodes;
+      completedNodes = progress['completedNodes'] as int? ?? completedNodes;
+    }
+
+    return LearningPathModel(
+      id: pathData['id'] as String? ?? '',
+      techStack: pathData['techStack'] as String? ?? '',
+      title: pathData['title'] as String? ?? '',
+      subtitle: pathData['subtitle'] as String? ?? '',
+      characterIcon: pathData['characterIcon'] as String? ?? '🗡️',
+      characterDialog: pathData['characterDialog'] as String? ?? '',
+      categories: parsedCategories,
+      totalNodes: totalNodes,
+      completedNodes: completedNodes,
+    );
+  }
+
+  /// 解析分类数据
+  PathCategoryModel _parseCategoryFromApi(Map<String, dynamic> data) {
+    final nodes = data['nodes'] as List<dynamic>? ?? [];
+
+    int totalNodes = nodes.length;
+    int completedNodes = 0;
+
+    final parsedNodes = nodes.map((node) {
+      final parsed = _parseNodeFromApi(node as Map<String, dynamic>);
+      if (parsed.status == NodeStatus.completed) {
+        completedNodes++;
+      }
+      return parsed;
+    }).toList();
+
+    return PathCategoryModel(
+      id: data['id'] as String? ?? '',
+      name: data['name'] as String? ?? '',
+      icon: data['icon'] as String? ?? '',
+      color: data['color'] as String? ?? '#58CC02',
+      order: data['sortOrder'] as int? ?? data['order'] as int? ?? 0,
+      totalNodes: totalNodes,
+      completedNodes: completedNodes,
+      nodes: parsedNodes,
+    );
+  }
+
+  /// 解析节点数据
+  PathNodeModel _parseNodeFromApi(Map<String, dynamic> data) {
+    return PathNodeModel(
+      id: data['id'] as String? ?? '',
+      title: data['title'] as String? ?? '',
+      icon: data['icon'] as String? ?? '',
+      color: data['color'] as String? ?? 'primary',
+      order: data['sortOrder'] as int? ?? data['order'] as int? ?? 0,
+      status: _parseNodeStatus(data['status'] as String?),
+      questionIds: _parseQuestionIds(data['questionIds']),
+      prerequisiteNodeId: data['prerequisiteNodeId'] as String?,
+      estimatedMinutes: data['estimatedMinutes'] as int? ?? 10,
+    );
+  }
+
+  /// 解析节点状态
+  NodeStatus _parseNodeStatus(String? status) {
+    switch (status) {
+      case 'unlocked':
+        return NodeStatus.unlocked;
+      case 'completed':
+        return NodeStatus.completed;
+      case 'current':
+        // current 视为 unlocked
+        return NodeStatus.unlocked;
+      case 'locked':
+      default:
+        return NodeStatus.locked;
+    }
+  }
+
+  /// 解析题目 ID 列表
+  List<String> _parseQuestionIds(dynamic data) {
+    if (data == null) return [];
+    if (data is List) {
+      return data.cast<String>();
+    }
+    return [];
   }
 }

@@ -3,12 +3,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../network/api_client.dart';
 import '../../network/api_exception.dart';
+import '../../core/device_id.dart';
 import '../models/learning_progress_model.dart';
 import '../models/wrong_book_model.dart';
 
 abstract class UserProgressRepository {
   Future<List<WrongBookModel>> getWrongBooks({
-    required String userId,
+    String? userId,
     bool? isMastered,
   });
 
@@ -16,10 +17,10 @@ abstract class UserProgressRepository {
 
   Future<void> deleteWrongBook(String id);
 
-  Future<LearningProgressModel> getLearningProgress(String userId);
+  Future<LearningProgressModel> getLearningProgress([String? userId]);
 
   Future<void> recordAnswer({
-    required String userId,
+    String? userId,
     required String questionId,
     required String selectedOptionId,
     required bool isCorrect,
@@ -40,6 +41,9 @@ class ApiUserProgressRepository implements UserProgressRepository {
   static const String _wrongBooksCacheKey = 'cached_wrong_books';
   static const String _progressCacheKey = 'cached_progress';
 
+  /// 获取当前设备 ID 作为用户 ID
+  Future<String> get _currentUserId async => DeviceId.get();
+
   Future<SharedPreferences> get _preferences async {
     _prefs ??= await SharedPreferences.getInstance();
     return _prefs!;
@@ -47,14 +51,15 @@ class ApiUserProgressRepository implements UserProgressRepository {
 
   @override
   Future<List<WrongBookModel>> getWrongBooks({
-    required String userId,
+    String? userId,
     bool? isMastered,
   }) async {
+    final effectiveUserId = userId ?? await _currentUserId;
     try {
       final response = await _client.dio.get(
         '/api/wrong-book',
         queryParameters: {
-          'userId': userId,
+          'userId': effectiveUserId,
           if (isMastered != null) 'isMastered': isMastered.toString(),
         },
       );
@@ -101,11 +106,12 @@ class ApiUserProgressRepository implements UserProgressRepository {
   }
 
   @override
-  Future<LearningProgressModel> getLearningProgress(String userId) async {
+  Future<LearningProgressModel> getLearningProgress([String? userId]) async {
+    final effectiveUserId = userId ?? await _currentUserId;
     try {
       final response = await _client.dio.get(
         '/api/progress',
-        queryParameters: {'userId': userId},
+        queryParameters: {'userId': effectiveUserId},
       );
 
       final progress =
@@ -127,15 +133,16 @@ class ApiUserProgressRepository implements UserProgressRepository {
 
   @override
   Future<void> recordAnswer({
-    required String userId,
+    String? userId,
     required String questionId,
     required String selectedOptionId,
     required bool isCorrect,
     int? answerTimeMs,
   }) async {
+    final effectiveUserId = userId ?? await _currentUserId;
     try {
       await _client.dio.post('/api/answers', data: {
-        'userId': userId,
+        'userId': effectiveUserId,
         'questionId': questionId,
         'selectedOptionId': selectedOptionId,
         'isCorrect': isCorrect,

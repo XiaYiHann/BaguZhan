@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS questions (
   mnemonic TEXT,
   scenario TEXT,
   tags TEXT,
+  deleted_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -23,6 +24,7 @@ CREATE TABLE IF NOT EXISTS options (
 CREATE INDEX IF NOT EXISTS idx_questions_topic ON questions(topic);
 CREATE INDEX IF NOT EXISTS idx_questions_difficulty ON questions(difficulty);
 CREATE INDEX IF NOT EXISTS idx_questions_topic_difficulty ON questions(topic, difficulty);
+CREATE INDEX IF NOT EXISTS idx_questions_deleted_at ON questions(deleted_at);
 CREATE INDEX IF NOT EXISTS idx_options_question_id ON options(question_id);
 
 -- 用户答题记录表
@@ -102,7 +104,7 @@ CREATE TABLE IF NOT EXISTS path_nodes (
   icon VARCHAR(10),
   color VARCHAR(20) DEFAULT 'primary',
   sort_order INTEGER DEFAULT 0,
-  question_ids TEXT[],
+  question_ids TEXT,  -- JSON 数组字符串，如 '["q001","q002","q003"')'
   prerequisite_node_id VARCHAR(50) REFERENCES path_nodes(id),
   estimated_minutes INTEGER DEFAULT 10,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -125,7 +127,7 @@ CREATE TABLE IF NOT EXISTS user_path_progress (
 
 -- 插入 JavaScript 学习路径
 INSERT INTO learning_paths (id, tech_stack, title, subtitle, character_icon, character_dialog) VALUES
-('path_js', 'JavaScript', 'JavaScript核心', '从基础到进阶，掌握JS核心概念', '🗡️', '准备好斩题了吗？');
+('path_js', 'javascript', 'JavaScript核心', '从基础到进阶，掌握JS核心概念', '🗡️', '准备好斩题了吗？');
 
 -- 插入路径分类：基础语法、进阶概念、ES6+特性
 INSERT INTO path_categories (id, path_id, name, icon, color, sort_order) VALUES
@@ -135,36 +137,36 @@ INSERT INTO path_categories (id, path_id, name, icon, color, sort_order) VALUES
 
 -- 插入基础语法分类节点（8个节点）
 INSERT INTO path_nodes (id, category_id, title, icon, color, sort_order, question_ids, prerequisite_node_id, estimated_minutes) VALUES
-('node_js_var', 'cat_js_basic', '变量与作用域', '☕', 'primary', 1, ARRAY['q001', 'q002', 'q003'], NULL, 10),
-('node_js_type', 'cat_js_basic', '数据类型', '🔢', 'primary', 2, ARRAY['q004', 'q005', 'q006'], 'node_js_var', 10),
-('node_js_operator', 'cat_js_basic', '运算符与表达式', '➕', 'primary', 3, ARRAY['q007', 'q008', 'q009'], 'node_js_type', 10),
-('node_js_control', 'cat_js_basic', '流程控制', '🔀', 'primary', 4, ARRAY['q010', 'q011', 'q012'], 'node_js_operator', 10),
-('node_js_function_basic', 'cat_js_basic', '函数基础', '🔧', 'primary', 5, ARRAY['q013', 'q014', 'q015'], 'node_js_control', 15),
-('node_js_array', 'cat_js_basic', '数组操作', '📊', 'primary', 6, ARRAY['q016', 'q017', 'q018'], 'node_js_function_basic', 15),
-('node_js_object', 'cat_js_basic', '对象基础', '📦', 'primary', 7, ARRAY['q019', 'q020', 'q021'], 'node_js_array', 15),
-('node_js_basic_quiz', 'cat_js_basic', '基础语法测验', '🎁', 'accent', 8, ARRAY['q022', 'q023', 'q024', 'q025'], 'node_js_object', 20);
+('node_js_var', 'cat_js_basic', '变量与作用域', '☕', 'primary', 1, '["q001","q002","q003"]', NULL, 10),
+('node_js_type', 'cat_js_basic', '数据类型', '🔢', 'primary', 2, '["q004","q005","q006"]', 'node_js_var', 10),
+('node_js_operator', 'cat_js_basic', '运算符与表达式', '➕', 'primary', 3, '["q007","q008","q009"]', 'node_js_type', 10),
+('node_js_control', 'cat_js_basic', '流程控制', '🔀', 'primary', 4, '["q010","q011","q012"]', 'node_js_operator', 10),
+('node_js_function_basic', 'cat_js_basic', '函数基础', '🔧', 'primary', 5, '["q013","q014","q015"]', 'node_js_control', 15),
+('node_js_array', 'cat_js_basic', '数组操作', '📊', 'primary', 6, '["q016","q017","q018"]', 'node_js_function_basic', 15),
+('node_js_object', 'cat_js_basic', '对象基础', '📦', 'primary', 7, '["q019","q020","q021"]', 'node_js_array', 15),
+('node_js_basic_quiz', 'cat_js_basic', '基础语法测验', '🎁', 'accent', 8, '["q022","q023","q024","q025"]', 'node_js_object', 20);
 
 -- 插入进阶概念分类节点（8个节点）
 INSERT INTO path_nodes (id, category_id, title, icon, color, sort_order, question_ids, prerequisite_node_id, estimated_minutes) VALUES
-('node_js_scope', 'cat_js_advanced', '作用域链', '🔗', 'secondary', 1, ARRAY['q026', 'q027', 'q028'], 'node_js_basic_quiz', 15),
-('node_js_hoisting', 'cat_js_advanced', '变量提升', '⬆️', 'secondary', 2, ARRAY['q029', 'q030', 'q031'], 'node_js_scope', 15),
-('node_js_this', 'cat_js_advanced', 'this指向', '🎯', 'secondary', 3, ARRAY['q032', 'q033', 'q034'], 'node_js_hoisting', 20),
-('node_js_prototype', 'cat_js_advanced', '原型与继承', '🧬', 'secondary', 4, ARRAY['q035', 'q036', 'q037'], 'node_js_this', 20),
-('node_js_closure', 'cat_js_advanced', '闭包', '🔒', 'secondary', 5, ARRAY['q038', 'q039', 'q040'], 'node_js_prototype', 20),
-('node_js_async', 'cat_js_advanced', '异步编程', '⏱️', 'secondary', 6, ARRAY['q041', 'q042', 'q043'], 'node_js_closure', 25),
-('node_js_event', 'cat_js_advanced', '事件循环', '🔄', 'secondary', 7, ARRAY['q044', 'q045', 'q046'], 'node_js_async', 25),
-('node_js_advanced_quiz', 'cat_js_advanced', '进阶概念测验', '🎁', 'accent', 8, ARRAY['q047', 'q048', 'q049', 'q050'], 'node_js_event', 25);
+('node_js_scope', 'cat_js_advanced', '作用域链', '🔗', 'secondary', 1, '["q026","q027","q028"]', 'node_js_basic_quiz', 15),
+('node_js_hoisting', 'cat_js_advanced', '变量提升', '⬆️', 'secondary', 2, '["q029","q030","q031"]', 'node_js_scope', 15),
+('node_js_this', 'cat_js_advanced', 'this指向', '🎯', 'secondary', 3, '["q032","q033","q034"]', 'node_js_hoisting', 20),
+('node_js_prototype', 'cat_js_advanced', '原型与继承', '🧬', 'secondary', 4, '["q035","q036","q037"]', 'node_js_this', 20),
+('node_js_closure', 'cat_js_advanced', '闭包', '🔒', 'secondary', 5, '["q038","q039","q040"]', 'node_js_prototype', 20),
+('node_js_async', 'cat_js_advanced', '异步编程', '⏱️', 'secondary', 6, '["q041","q042","q043"]', 'node_js_closure', 25),
+('node_js_event', 'cat_js_advanced', '事件循环', '🔄', 'secondary', 7, '["q044","q045","q046"]', 'node_js_async', 25),
+('node_js_advanced_quiz', 'cat_js_advanced', '进阶概念测验', '🎁', 'accent', 8, '["q047","q048","q049","q050"]', 'node_js_event', 25);
 
 -- 插入ES6+特性分类节点（8个节点）
 INSERT INTO path_nodes (id, category_id, title, icon, color, sort_order, question_ids, prerequisite_node_id, estimated_minutes) VALUES
-('node_js_letconst', 'cat_js_es6', 'let与const', '🆕', 'primary', 1, ARRAY['q051', 'q052', 'q053'], 'node_js_advanced_quiz', 10),
-('node_js_arrow', 'cat_js_es6', '箭头函数', '➡️', 'primary', 2, ARRAY['q054', 'q055', 'q056'], 'node_js_letconst', 10),
-('node_js_destructure', 'cat_js_es6', '解构赋值', '📋', 'primary', 3, ARRAY['q057', 'q058', 'q059'], 'node_js_arrow', 15),
-('node_js_spread', 'cat_js_es6', '展开运算符', '🌊', 'primary', 4, ARRAY['q060', 'q061', 'q062'], 'node_js_destructure', 15),
-('node_js_promise', 'cat_js_es6', 'Promise', '🤝', 'primary', 5, ARRAY['q063', 'q064', 'q065'], 'node_js_spread', 20),
-('node_js_asyncawait', 'cat_js_es6', 'Async/Await', '⚡', 'primary', 6, ARRAY['q066', 'q067', 'q068'], 'node_js_promise', 20),
-('node_js_module', 'cat_js_es6', '模块化', '📦', 'primary', 7, ARRAY['q069', 'q070', 'q071'], 'node_js_asyncawait', 15),
-('node_js_es6_quiz', 'cat_js_es6', 'ES6+特性测验', '🎁', 'accent', 8, ARRAY['q072', 'q073', 'q074', 'q075'], 'node_js_module', 25);
+('node_js_letconst', 'cat_js_es6', 'let与const', '🆕', 'primary', 1, '["q051","q052","q053"]', 'node_js_advanced_quiz', 10),
+('node_js_arrow', 'cat_js_es6', '箭头函数', '➡️', 'primary', 2, '["q054","q055","q056"]', 'node_js_letconst', 10),
+('node_js_destructure', 'cat_js_es6', '解构赋值', '📋', 'primary', 3, '["q057","q058","q059"]', 'node_js_arrow', 15),
+('node_js_spread', 'cat_js_es6', '展开运算符', '🌊', 'primary', 4, '["q060","q061","q062"]', 'node_js_destructure', 15),
+('node_js_promise', 'cat_js_es6', 'Promise', '🤝', 'primary', 5, '["q063","q064","q065"]', 'node_js_spread', 20),
+('node_js_asyncawait', 'cat_js_es6', 'Async/Await', '⚡', 'primary', 6, '["q066","q067","q068"]', 'node_js_promise', 20),
+('node_js_module', 'cat_js_es6', '模块化', '📦', 'primary', 7, '["q069","q070","q071"]', 'node_js_asyncawait', 15),
+('node_js_es6_quiz', 'cat_js_es6', 'ES6+特性测验', '🎁', 'accent', 8, '["q072","q073","q074","q075"]', 'node_js_module', 25);
 
 -- 学习路径相关索引
 CREATE INDEX IF NOT EXISTS idx_path_categories_path_id ON path_categories(path_id);

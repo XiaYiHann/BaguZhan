@@ -9,7 +9,7 @@ import { executeSqlFile } from '../../database/sql';
 describe('UserProgress API', () => {
   let db: DbClient;
   let app: ReturnType<typeof createApp>;
-  const testUserId = 'test-user-1';
+  const testDeviceId = '550e8400-e29b-41d4-a716-446655440001';
 
   beforeAll(async () => {
     db = openDatabase(':memory:');
@@ -41,10 +41,14 @@ describe('UserProgress API', () => {
     await db.run('DELETE FROM learning_progress');
   });
 
+  // Helper to make requests with device ID header
+  const withDeviceId = (method: string, path: string) => {
+    return request(app)[method](path).set('X-Device-ID', testDeviceId);
+  };
+
   describe('POST /api/answers', () => {
     it('should record a correct answer', async () => {
-      const response = await request(app).post('/api/answers').send({
-        userId: testUserId,
+      const response = await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: true,
@@ -53,7 +57,6 @@ describe('UserProgress API', () => {
 
       expect(response.status).toBe(201);
       expect(response.body).toMatchObject({
-        userId: testUserId,
         questionId: 'test-q-1',
         isCorrect: true,
         answerTimeMs: 5000,
@@ -61,8 +64,7 @@ describe('UserProgress API', () => {
     });
 
     it('should record wrong answer and add to wrong book', async () => {
-      const response = await request(app).post('/api/answers').send({
-        userId: testUserId,
+      const response = await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: false,
@@ -72,17 +74,14 @@ describe('UserProgress API', () => {
       expect(response.body.isCorrect).toBe(false);
 
       // Check wrong book
-      const wrongBookRes = await request(app)
-        .get('/api/wrong-book')
-        .query({ userId: testUserId });
+      const wrongBookRes = await withDeviceId('get', '/api/wrong-book');
 
       expect(wrongBookRes.body).toHaveLength(1);
       expect(wrongBookRes.body[0].questionId).toBe('test-q-1');
     });
 
     it('should return 400 for missing fields', async () => {
-      const response = await request(app).post('/api/answers').send({
-        userId: testUserId,
+      const response = await withDeviceId('post', '/api/answers').send({
       });
 
       expect(response.status).toBe(400);
@@ -92,16 +91,13 @@ describe('UserProgress API', () => {
   describe('GET /api/answers', () => {
     it('should get answer history', async () => {
       // Create some answers
-      await request(app).post('/api/answers').send({
-        userId: testUserId,
+      await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: true,
       });
 
-      const response = await request(app)
-        .get('/api/answers')
-        .query({ userId: testUserId });
+      const response = await withDeviceId('get', '/api/answers');
 
       expect(response.status).toBe(200);
       expect(response.body.answers).toHaveLength(1);
@@ -112,16 +108,13 @@ describe('UserProgress API', () => {
   describe('GET /api/wrong-book', () => {
     it('should get wrong book items', async () => {
       // Add to wrong book
-      await request(app).post('/api/answers').send({
-        userId: testUserId,
+      await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: false,
       });
 
-      const response = await request(app)
-        .get('/api/wrong-book')
-        .query({ userId: testUserId });
+      const response = await withDeviceId('get', '/api/wrong-book');
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(1);
@@ -130,23 +123,19 @@ describe('UserProgress API', () => {
 
     it('should filter by isMastered', async () => {
       // Add to wrong book and mark as mastered
-      await request(app).post('/api/answers').send({
-        userId: testUserId,
+      await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: false,
       });
 
-      const wrongBookRes = await request(app)
-        .get('/api/wrong-book')
-        .query({ userId: testUserId });
+      const wrongBookRes = await withDeviceId('get', '/api/wrong-book');
       const wrongBookId = wrongBookRes.body[0].id;
 
-      await request(app).patch(`/api/wrong-book/${wrongBookId}/master`);
+      await withDeviceId('patch', `/api/wrong-book/${wrongBookId}/master`);
 
-      const response = await request(app)
-        .get('/api/wrong-book')
-        .query({ userId: testUserId, isMastered: 'false' });
+      const response = await withDeviceId('get', '/api/wrong-book')
+        .query({ isMastered: 'false' });
 
       expect(response.body).toHaveLength(0);
     });
@@ -155,21 +144,16 @@ describe('UserProgress API', () => {
   describe('PATCH /api/wrong-book/:id/master', () => {
     it('should mark wrong book as mastered', async () => {
       // Add to wrong book
-      await request(app).post('/api/answers').send({
-        userId: testUserId,
+      await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: false,
       });
 
-      const wrongBookRes = await request(app)
-        .get('/api/wrong-book')
-        .query({ userId: testUserId });
+      const wrongBookRes = await withDeviceId('get', '/api/wrong-book');
       const wrongBookId = wrongBookRes.body[0].id;
 
-      const response = await request(app).patch(
-        `/api/wrong-book/${wrongBookId}/master`
-      );
+      const response = await withDeviceId('patch', `/api/wrong-book/${wrongBookId}/master`);
 
       expect(response.status).toBe(200);
       expect(response.body.isMastered).toBe(true);
@@ -177,9 +161,7 @@ describe('UserProgress API', () => {
     });
 
     it('should return 404 for non-existent id', async () => {
-      const response = await request(app).patch(
-        '/api/wrong-book/non-existent-id/master'
-      );
+      const response = await withDeviceId('patch', '/api/wrong-book/non-existent-id/master');
       expect(response.status).toBe(404);
     });
   });
@@ -187,21 +169,16 @@ describe('UserProgress API', () => {
   describe('DELETE /api/wrong-book/:id', () => {
     it('should delete wrong book item', async () => {
       // Add to wrong book
-      await request(app).post('/api/answers').send({
-        userId: testUserId,
+      await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: false,
       });
 
-      const wrongBookRes = await request(app)
-        .get('/api/wrong-book')
-        .query({ userId: testUserId });
+      const wrongBookRes = await withDeviceId('get', '/api/wrong-book');
       const wrongBookId = wrongBookRes.body[0].id;
 
-      const response = await request(app).delete(
-        `/api/wrong-book/${wrongBookId}`
-      );
+      const response = await withDeviceId('delete', `/api/wrong-book/${wrongBookId}`);
 
       expect(response.status).toBe(204);
     });
@@ -210,20 +187,16 @@ describe('UserProgress API', () => {
   describe('GET /api/progress', () => {
     it('should get learning progress', async () => {
       // Record some answers
-      await request(app).post('/api/answers').send({
-        userId: testUserId,
+      await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: true,
       });
 
-      const response = await request(app)
-        .get('/api/progress')
-        .query({ userId: testUserId });
+      const response = await withDeviceId('get', '/api/progress');
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
-        userId: testUserId,
         totalAnswered: 1,
         totalCorrect: 1,
         accuracyRate: 1,
@@ -233,16 +206,13 @@ describe('UserProgress API', () => {
 
   describe('GET /api/progress/stats', () => {
     it('should get detailed stats', async () => {
-      await request(app).post('/api/answers').send({
-        userId: testUserId,
+      await withDeviceId('post', '/api/answers').send({
         questionId: 'test-q-1',
         selectedOptionId: 'test-opt-1',
         isCorrect: false,
       });
 
-      const response = await request(app)
-        .get('/api/progress/stats')
-        .query({ userId: testUserId });
+      const response = await withDeviceId('get', '/api/progress/stats');
 
       expect(response.status).toBe(200);
       expect(response.body.progress).toBeDefined();
