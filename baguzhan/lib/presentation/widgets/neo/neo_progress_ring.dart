@@ -177,7 +177,7 @@ class _RingPainter extends CustomPainter {
 }
 
 /// 带中央按钮的进度环（用于学习仪表板）
-class NeoProgressButton extends StatelessWidget {
+class NeoProgressButton extends StatefulWidget {
   const NeoProgressButton({
     super.key,
     required this.progress,
@@ -196,26 +196,49 @@ class NeoProgressButton extends StatelessWidget {
   final double strokeWidth;
 
   @override
+  State<NeoProgressButton> createState() => _NeoProgressButtonState();
+}
+
+class _NeoProgressButtonState extends State<NeoProgressButton> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: size + 32, // 为阴影留空间
-      height: size + 32,
+      width: widget.size + 32, // 为阴影留空间
+      height: widget.size + 32,
       child: Stack(
         alignment: Alignment.center,
         children: [
           // 进度环
           NeoProgressRing(
-            progress: progress,
-            size: size,
-            strokeWidth: strokeWidth,
+            progress: widget.progress,
+            size: widget.size,
+            strokeWidth: widget.strokeWidth,
           ),
           // 中央按钮
           Positioned(
             child: GestureDetector(
-              onTap: onPressed,
-              child: Container(
-                width: size * 0.7,
-                height: size * 0.7,
+              onTap: widget.onPressed,
+              onTapDown: (_) {
+                setState(() => _isPressed = true);
+              },
+              onTapUp: (_) {
+                setState(() => _isPressed = false);
+              },
+              onTapCancel: () {
+                setState(() => _isPressed = false);
+              },
+              child: AnimatedContainer(
+                duration: NeoBrutalTheme.durationPress,
+                curve: NeoBrutalTheme.curvePress,
+                transform: Matrix4.translationValues(
+                  _isPressed ? 4 : 0,
+                  _isPressed ? 4 : 0,
+                  0,
+                ),
+                width: widget.size * 0.7,
+                height: widget.size * 0.7,
                 decoration: BoxDecoration(
                   color: NeoBrutalTheme.primary,
                   shape: BoxShape.circle,
@@ -223,22 +246,24 @@ class NeoProgressButton extends StatelessWidget {
                     color: NeoBrutalTheme.borderColor,
                     width: NeoBrutalTheme.borderWidth,
                   ),
-                  boxShadow: NeoBrutalTheme.shadowLg,
+                  boxShadow: _isPressed
+                      ? NeoBrutalTheme.shadowPressed
+                      : NeoBrutalTheme.shadowLg,
                 ),
                 child: Center(
-                  child: buttonIcon != null
+                  child: widget.buttonIcon != null
                       ? Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              buttonIcon,
+                              widget.buttonIcon,
                               color: Colors.white,
-                              size: size * 0.25,
+                              size: widget.size * 0.25,
                             ),
-                            if (buttonLabel != null) ...[
+                            if (widget.buttonLabel != null) ...[
                               const SizedBox(height: 4),
                               Text(
-                                buttonLabel!,
+                                widget.buttonLabel!,
                                 style: const TextStyle(
                                   color: NeoBrutalTheme.charcoal,
                                   fontSize: 10,

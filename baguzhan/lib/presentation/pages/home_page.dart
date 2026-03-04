@@ -5,6 +5,7 @@ import '../../core/theme/neo_brutal_theme.dart';
 import '../widgets/neo/neo_bottom_nav.dart';
 import '../widgets/neo/neo_container.dart';
 import '../widgets/neo/neo_stat_bar.dart';
+import '../widgets/neo/neo_user_profile_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -66,6 +67,12 @@ class _HomePageState extends State<HomePage>
       body: SafeArea(
         child: Column(
           children: [
+            // 用户信息头部栏
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: NeoUserProfileBar(),
+            ),
+
             // 顶部统计栏
             NeoStatBar.standard(
               streak: 5,
